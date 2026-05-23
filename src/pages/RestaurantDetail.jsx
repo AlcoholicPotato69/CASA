@@ -40,7 +40,7 @@ const RestaurantDetail = () => {
     return () => ctx.revert();
   }, [id]);
 
-  if (!data) return <div style={{ paddingTop: '12rem', paddingBottom: '6rem', textAlign: 'center' }}>Restaurante no encontrado. <Link to="/restaurantes">Volver</Link></div>;
+  if (!data) return <div style={{ paddingTop: 'clamp(8rem, 15vh, 12rem)', paddingBottom: '6rem', textAlign: 'center' }}>Restaurante no encontrado. <Link to="/restaurantes">Volver</Link></div>;
 
   return (
     <div>
@@ -69,7 +69,7 @@ const RestaurantDetail = () => {
             </div>
             
             <div className="md:col-span-5 fade-up">
-              <div className="luxury-card" style={{ padding: '3rem' }}>
+              <div className="luxury-card" style={{ padding: 'clamp(1.5rem, 5vw, 3rem)' }}>
                 <h3 className="text-h3" style={{ marginBottom: '2rem', color: 'var(--color-accent)' }}>Información</h3>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

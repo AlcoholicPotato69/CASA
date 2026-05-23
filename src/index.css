@@ -97,19 +97,19 @@ h1, h2, h3, h4, h5, h6 {
 .text-script {
   font-family: var(--font-script);
   color: var(--color-accent);
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(2rem, 5vw, 4rem);
   line-height: 1;
 }
 
 .text-hero {
-  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-size: clamp(2.2rem, 8vw, 6.5rem);
   font-weight: 500;
   letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 
-.text-h2 { font-size: clamp(2.5rem, 5vw, 4.5rem); }
-.text-h3 { font-size: clamp(2rem, 4vw, 3rem); }
+.text-h2 { font-size: clamp(1.8rem, 5vw, 4.5rem); }
+.text-h3 { font-size: clamp(1.5rem, 4vw, 3rem); }
 
 .text-body-lg {
   font-size: clamp(1rem, 2vw, 1.125rem); /* Minimum 16px for readability */

@@ -63,7 +63,7 @@ const Navigation = () => {
       left: 0,
       width: '100%',
       zIndex: 100, 
-      padding: '1rem 2rem',
+      padding: '1rem clamp(1rem, 4vw, 2rem)',
       background: 'rgba(10, 10, 10, 0.85)',
       backdropFilter: 'blur(12px)',
       borderBottom: '1px solid var(--color-border-inner)',
@@ -190,7 +190,7 @@ const Navigation = () => {
                 to={item.path} 
                 style={{
                   fontFamily: 'var(--font-heading)',
-                  fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                  fontSize: 'clamp(1.8rem, 5vw, 4rem)',
                   color: location.pathname === item.path ? 'var(--color-accent)' : 'var(--color-text-primary)',
                   textDecoration: 'none',
                   opacity: 0,

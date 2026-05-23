@@ -45,7 +45,7 @@ const Home = () => {
           minHeight: '100vh',
           display: 'flex',
           alignItems: 'center',
-          paddingTop: '12rem',
+          paddingTop: 'clamp(8rem, 15vh, 12rem)',
           overflow: 'hidden'
         }}
       >
@@ -84,7 +84,7 @@ const Home = () => {
             </div>
 
             <div style={{ overflow: 'hidden' }}>
-              <div className="reveal-text" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+              <div className="reveal-text" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center' }}>
                 <Link to="/espacios" style={{ textDecoration: 'none' }}>
                   <MagneticButton variant="primary" as="div">
                     Ver Espacios

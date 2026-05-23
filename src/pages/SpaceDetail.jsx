@@ -97,7 +97,7 @@ const SpaceDetail = () => {
   }, [id]);
 
   if (!data) return (
-    <div style={{ paddingTop: '12rem', paddingBottom: '6rem', textAlign: 'center' }}>Espacio no encontrado. <Link to="/espacios">Volver</Link></div>
+    <div style={{ paddingTop: 'clamp(8rem, 15vh, 12rem)', paddingBottom: '6rem', textAlign: 'center' }}>Espacio no encontrado. <Link to="/espacios">Volver</Link></div>
   );
 
   return (
@@ -125,7 +125,7 @@ const SpaceDetail = () => {
               </p>
               
               <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginTop: '3rem', marginBottom: '1.5rem', color: 'var(--color-accent)' }}>Características Destacadas</h4>
-              <ul style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', listStyle: 'none', color: 'var(--color-text-primary)' }}>
+              <ul style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', listStyle: 'none', color: 'var(--color-text-primary)' }}>
                 {data.features.map((feature, idx) => (
                   <li key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <div style={{ width: '8px', height: '8px', backgroundColor: 'var(--color-accent)', borderRadius: '50%' }} />
@@ -136,7 +136,7 @@ const SpaceDetail = () => {
             </div>
             
             <div className="md:col-span-5 fade-up">
-              <div className="luxury-card" style={{ padding: '3rem' }}>
+              <div className="luxury-card" style={{ padding: 'clamp(1.5rem, 5vw, 3rem)' }}>
                 <h3 className="text-h3" style={{ marginBottom: '2rem', color: 'var(--color-accent)' }}>Ficha Técnica</h3>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

@@ -59,7 +59,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2rem', display: 'flex', flexDirection: 'column', md: { flexDirection: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: '1rem', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.8rem' }}>
+        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.8rem' }}>
           <div>COPYRIGHT © {new Date().getFullYear()} CASA DE PIEDRA. TODOS LOS DERECHOS RESERVADOS.</div>
           <Link to="/terminos-y-condiciones" style={{ color: 'inherit', textDecoration: 'underline' }}>Aviso de Privacidad</Link>
         </div>

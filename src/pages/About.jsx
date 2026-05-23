@@ -28,7 +28,7 @@ const About = () => {
   }, []);
 
   return (
-    <div style={{ paddingTop: '12rem', paddingBottom: '6rem' }}>
+    <div style={{ paddingTop: 'clamp(8rem, 15vh, 12rem)', paddingBottom: '6rem' }}>
       <section className="section" ref={sectionRef}>
         <div className="container">
           <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
@@ -39,7 +39,7 @@ const About = () => {
               </h2>
             </div>
             
-            <div className="about-reveal luxury-card" style={{ padding: '4rem', textAlign: 'left', display: 'grid', md: { gridTemplateColumns: '1fr 1fr' }, gap: '3rem' }}>
+            <div className="about-reveal luxury-card grid md:grid-cols-2 gap-8" style={{ padding: 'clamp(1.5rem, 5vw, 4rem)', textAlign: 'left' }}>
               <div>
                 <p className="text-body-lg" style={{ marginBottom: '1.5rem' }}>
                   En el corazón de nuestra querida ciudad se erige la sublime ex hacienda, Casa de Piedra. Fundada en 1845, es famosa por su arquitectura y tradición incomparable.

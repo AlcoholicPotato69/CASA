@@ -29,7 +29,7 @@ const Gallery = () => {
   }, []);
 
   return (
-    <div style={{ paddingTop: '12rem', paddingBottom: '6rem' }}>
+    <div style={{ paddingTop: 'clamp(8rem, 15vh, 12rem)', paddingBottom: '6rem' }}>
       <div className="container">
         <div style={{ marginBottom: '4rem', textAlign: 'center' }}>
           <span className="text-script" style={{ fontSize: '3rem' }}>Galería</span>
