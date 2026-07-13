@@ -4,6 +4,7 @@ import Lenis from '@studio-freight/lenis';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
+import DynamicTitle from './components/DynamicTitle';
 
 import Home from './pages/Home';
 import About from './pages/About';
@@ -70,6 +71,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
+      <DynamicTitle />
       <div className="noise-overlay" />
       <Navigation />
       <WhatsAppButton />

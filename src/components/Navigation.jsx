@@ -127,12 +127,11 @@ const Navigation = () => {
 
   const navItems = [
     { label: 'Inicio', path: '/' },
-    { label: 'Quiénes Somos', path: '/quienes-somos' },
-    { label: 'Espacios', path: '/espacios' },
+    { label: 'Venues', path: '/espacios' },
     { label: 'Eventos', path: '/eventos' },
     { label: 'Restaurantes', path: '/restaurantes' },
     { label: 'Galería', path: '/galeria' },
-    { label: 'Contacto', path: '/contacto' }
+    { label: 'Contacto', path: '#quote-modal', isModal: true }
   ];
 
   return (
@@ -152,6 +151,12 @@ const Navigation = () => {
             <Link 
               key={item.path} 
               to={item.path} 
+              onClick={(e) => {
+                if (item.isModal) {
+                  e.preventDefault();
+                  if (window.openQuoteModal) window.openQuoteModal('');
+                }
+              }}
               style={{
                 ...navStyles.desktopLink,
                 color: location.pathname === item.path ? 'var(--color-accent)' : 'var(--color-text-primary)'
@@ -173,11 +178,28 @@ const Navigation = () => {
           className="mobile-nav-btn"
           style={navStyles.hamburger} 
           onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle Menu"
-          aria-expanded={isOpen}
         >
-          <div style={{ ...navStyles.line, transform: isOpen ? 'rotate(45deg) translate(5px, 6px)' : 'none', backgroundColor: isOpen ? 'var(--color-text-primary)' : 'var(--color-accent)' }} />
-          <div style={{ ...navStyles.line, transform: isOpen ? 'rotate(-45deg) translate(5px, -6px)' : 'none', backgroundColor: isOpen ? 'var(--color-text-primary)' : 'var(--color-accent)' }} />
+          <span style={{
+            width: '24px',
+            height: '2px',
+            background: 'var(--color-accent)',
+            transition: 'all 0.3s',
+            transform: isOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none'
+          }} />
+          <span style={{
+            width: '24px',
+            height: '2px',
+            background: 'var(--color-accent)',
+            opacity: isOpen ? 0 : 1,
+            transition: 'all 0.3s'
+          }} />
+          <span style={{
+            width: '24px',
+            height: '2px',
+            background: 'var(--color-accent)',
+            transition: 'all 0.3s',
+            transform: isOpen ? 'rotate(-45deg) translate(6px, -6px)' : 'none'
+          }} />
         </button>
       </nav>
 
@@ -188,6 +210,13 @@ const Navigation = () => {
             <li key={item.path}>
               <Link 
                 to={item.path} 
+                onClick={(e) => {
+                  setIsOpen(false);
+                  if (item.isModal) {
+                    e.preventDefault();
+                    if (window.openQuoteModal) window.openQuoteModal('');
+                  }
+                }}
                 style={{
                   fontFamily: 'var(--font-heading)',
                   fontSize: 'clamp(1.8rem, 5vw, 4rem)',

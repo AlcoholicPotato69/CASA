@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="casaGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f3e5ab" />
+      <stop offset="50%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#c87d3a" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo circular oscuro opcional para perfecto contraste -->
+  <circle cx="50" cy="50" r="48" fill="#0a0a0a" />
+  
+  <!-- Borde circular exterior -->
+  <circle cx="50" cy="50" r="45" fill="none" stroke="url(#casaGoldGrad)" stroke-width="2.4" />
+
+  <!-- Línea horizontal de base y plaza -->
+  <line x1="6" y1="65" x2="94" y2="65" stroke="url(#casaGoldGrad)" stroke-width="2" />
+  <line x1="7" y1="69" x2="93" y2="69" stroke="url(#casaGoldGrad)" stroke-width="2" />
+
+  <!-- Líneas de perspectiva de la plaza inferior -->
+  <line x1="50" y1="69" x2="50" y2="95" stroke="url(#casaGoldGrad)" stroke-width="2" />
+  <line x1="50" y1="69" x2="25" y2="89.5" stroke="url(#casaGoldGrad)" stroke-width="2" />
+  <line x1="50" y1="69" x2="9" y2="79" stroke="url(#casaGoldGrad)" stroke-width="2" />
+  <line x1="50" y1="69" x2="75" y2="89.5" stroke="url(#casaGoldGrad)" stroke-width="2" />
+  <line x1="50" y1="69" x2="91" y2="79" stroke="url(#casaGoldGrad)" stroke-width="2" />
+
+  <!-- TORRE CENTRAL CASA DE PIEDRA -->
+  <!-- Cúpula / Techo -->
+  <path d="M 37 27 C 37 20, 63 20, 63 27 Z" fill="none" stroke="url(#casaGoldGrad)" stroke-width="2" />
+  <!-- Cornisa horizontal -->
+  <rect x="30" y="26.5" width="40" height="3.5" fill="none" stroke="url(#casaGoldGrad)" stroke-width="2" />
+  <!-- Cuerpo central de torre -->
+  <rect x="36" y="30" width="28" height="39" fill="#0a0a0a" stroke="url(#casaGoldGrad)" stroke-width="2.2" />
+  <!-- Dos ventanas cuadradas -->
+  <rect x="46" y="35" width="8" height="7.5" fill="none" stroke="url(#casaGoldGrad)" stroke-width="2" />
+  <rect x="46" y="46" width="8" height="7.5" fill="none" stroke="url(#casaGoldGrad)" stroke-width="2" />
+
+  <!-- ARCOS COLONIALES IZQUIERDOS -->
+  <!-- Línea superior cornisa izquierda -->
+  <path d="M 6 39 L 16 39 L 20 35 L 24 39 L 36 39" fill="none" stroke="url(#casaGoldGrad)" stroke-width="1.8" />
+  <!-- Pináculos izquierdos -->
+  <polygon points="9,39 8.2,32 10,28.5 11.8,32 11,39" fill="url(#casaGoldGrad)" />
+  <polygon points="27,39 26.2,32 28,28.5 29.8,32 29,39" fill="url(#casaGoldGrad)" />
+  <!-- Arcos izquierdos -->
+  <path d="M 6 45 C 12 45 16 49 16 56 L 16 65" fill="none" stroke="url(#casaGoldGrad)" stroke-width="1.8" />
+  <path d="M 20 65 L 20 56 C 20 49 26 45 32 45 C 34 45 36 46 36 48" fill="none" stroke="url(#casaGoldGrad)" stroke-width="1.8" />
+  <!-- Bases pilares izquierdos -->
+  <rect x="7" y="61" width="8" height="4" fill="none" stroke="url(#casaGoldGrad)" stroke-width="1.6" />
+  <rect x="21" y="61" width="8" height="4" fill="none" stroke="url(#casaGoldGrad)" stroke-width="1.6" />
+
+  <!-- ARCOS COLONIALES DERECHOS -->
+  <!-- Línea superior cornisa derecha -->
+  <path d="M 64 39 L 76 39 L 80 35 L 84 39 L 94 39" fill="none" stroke="url(#casaGoldGrad)" stroke-width="1.8" />
+  <!-- Pináculos derechos -->
+  <polygon points="71,39 70.2,32 72,28.5 73.8,32 73,39" fill="url(#casaGoldGrad)" />
+  <polygon points="89,39 88.2,32 90,28.5 91.8,32 91,39" fill="url(#casaGoldGrad)" />
+  <!-- Arcos derechos -->
+  <path d="M 64 48 C 64 46 66 45 68 45 C 74 45 80 49 80 56 L 80 65" fill="none" stroke="url(#casaGoldGrad)" stroke-width="1.8" />
+  <path d="M 84 65 L 84 56 C 84 49 88 45 94 45" fill="none" stroke="url(#casaGoldGrad)" stroke-width="1.8" />
+  <!-- Bases pilares derechos -->
+  <rect x="71" y="61" width="8" height="4" fill="none" stroke="url(#casaGoldGrad)" stroke-width="1.6" />
+  <rect x="85" y="61" width="8" height="4" fill="none" stroke="url(#casaGoldGrad)" stroke-width="1.6" />
+</svg>

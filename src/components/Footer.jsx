@@ -4,8 +4,10 @@ import { MapPin, Phone, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer style={{ backgroundColor: '#050505', borderTop: '1px solid var(--color-border)', paddingTop: '4rem', paddingBottom: '2rem' }}>
+    <footer style={{ background: 'linear-gradient(to bottom, rgba(8, 8, 8, 0.35) 0%, rgba(6, 6, 6, 0.88) 35%, #060606 100%)', paddingTop: '4rem', paddingBottom: '3rem', position: 'relative' }}>
       <div className="container">
+        {/* LUXURY DIVIDER justo donde termina el contenido de la página antes del footer */}
+        <div className="luxury-divider" style={{ marginTop: 0, marginBottom: '4.5rem' }}></div>
         <div className="grid md:grid-cols-12 gap-12" style={{ paddingBottom: '4rem' }}>
           
           {/* Brand & Socials */}
@@ -34,7 +36,7 @@ const Footer = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', color: 'var(--color-text-secondary)' }}>
                 <MapPin size={18} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: '4px' }} />
-                <span>Blvd. Juan Alonso de Torres 2002, Col. Valle del Campestre, León, Gto.</span>
+                <span>Av Cerro Gordo 270, Casa de Piedra, 37120 León de los Aldama, Gto.</span>
               </div>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', color: 'var(--color-text-secondary)' }}>
                 <Phone size={18} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />

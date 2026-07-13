@@ -113,11 +113,36 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.02em;
 }
 
-.text-script {
+.noise-overlay {
+  content: '';
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0 !important;
+  opacity: 0.058;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.luxury-card,
+.google-review-card,
+.other-space-card,
+.espacio-panel {
+  position: relative !important;
+  z-index: 1 !important;
+  background: #111111 !important;
+}
+
+.text-script,
+[style*="Great Vibes"],
+[style*="font-family: 'Great Vibes'"] {
   font-family: var(--font-script);
   color: var(--color-accent);
   font-size: clamp(1.5rem, 6vw, 6rem);
   line-height: 1;
+  text-shadow: 0 0 18px rgba(212, 175, 55, 0.7), 0 0 35px rgba(212, 175, 55, 0.4), 0 2px 8px rgba(0, 0, 0, 0.95);
+  display: inline-block;
 }
 
 .text-hero {
@@ -142,6 +167,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.2em;
   font-weight: 400;
   color: var(--color-accent);
+  text-shadow: 0 0 14px rgba(212, 175, 55, 0.55), 0 0 4px rgba(212, 175, 55, 0.3);
 }
 
 /* Layout Utilities */
@@ -178,12 +204,28 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Luxury Cards */
 .luxury-card {
-  background: var(--color-surface);
-  border: 1px solid rgba(255,255,255,0.05);
+  background: #111111 !important;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(212, 175, 55, 0.05);
   overflow: hidden;
   position: relative;
-  transition: border-color 0.4s ease;
+  transition: all 0.4s ease;
   border-radius: var(--radius-lg);
+}
+
+.luxury-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 38%, rgba(0, 0, 0, 0.52) 100%);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxury-card:hover::before {
+  opacity: 0;
 }
 
 .luxury-card:hover {
@@ -222,4 +264,16 @@ h1, h2, h3, h4, h5, h6 {
 @media (min-width: 1024px) {
   .desktop-nav { display: flex; }
   .mobile-nav-btn { display: none; }
+}
+
+/* Fade out profesional en el borde inferior de todos los banners */
+.banner-fade-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 160px;
+  background: linear-gradient(to bottom, rgba(8, 8, 8, 0) 0%, rgba(8, 8, 8, 0.75) 65%, #080808 100%);
+  z-index: 1;
+  pointer-events: none;
 }
