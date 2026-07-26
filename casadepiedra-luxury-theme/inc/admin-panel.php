@@ -11,7 +11,15 @@ function casa_save_global_options() {
 
     foreach ($_POST as $key => $value) {
         if (strpos($key, 'casa_opt_') === 0) {
-            update_option($key, wp_kses_post(stripslashes($value)));
+            if (is_array($value)) {
+                $clean_arr = array();
+                foreach ($value as $k => $v) {
+                    $clean_arr[sanitize_key($k)] = sanitize_text_field(stripslashes((string)$v));
+                }
+                update_option($key, $clean_arr);
+            } else {
+                update_option($key, wp_kses_post(stripslashes($value)));
+            }
         }
     }
 
@@ -312,44 +320,96 @@ function casa_admin_page_global() {
     echo '<p class="description" style="margin-bottom:16px; color:#555;">Controla los elementos de identidad visual generales del sitio en el encabezado superior (Navbar) y transiciones.</p>';
     casa_opt_image('Logotipo Principal (Header / Navbar)', 'casa_opt_global_logo');
     casa_opt_image('Logo para Transición (Cortinilla Negra entre páginas)', 'casa_opt_global_transition_logo');
+    casa_opt_image('Imagen de Fondo para el Footer (Opcional - si se deja vacío queda en negro)', 'casa_opt_footer_bg_image');
     echo '</div>';
 
     echo '<div style="background:#fafafa; border:1px solid #eaeaea; border-radius:10px; padding:22px; margin-bottom:30px;">';
     echo '<h2 style="margin-top:0; color:#111; border-bottom:1px solid #ddd; padding-bottom:10px;">2. Control Centralizado de Headers / Portadas de los Sitios</h2>';
-    echo '<p class="description" style="margin-bottom:18px; color:#555;">Administra centralizadamente desde este panel global las imágenes de portada (Headers superiores) y títulos de las diferentes páginas de todo el sitio:</p>';
+    echo '<p class="description" style="margin-bottom:18px; color:#555;">Administra centralizadamente desde este panel global las imágenes de portada (Headers superiores), títulos, subtítulos y descripciones de absolutamente todas las páginas de tu sitio:</p>';
     
     echo '<div style="display:grid; grid-template-columns:1fr; gap:18px;">';
+    
+    // 1. INICIO
+    echo '<div>';
+    echo '<h3 style="margin:0 0 10px 0; color:#1f2937; border-left:3px solid #d4af37; padding-left:10px;">Header Página: Inicio (Hero Principal)</h3>';
+    casa_opt_image('Imagen de Portada "Inicio"', 'casa_opt_home_hero_img');
+    casa_opt_text('Subtítulo Superior (Ej. Desde 1845)', 'casa_opt_home_hero_subtitle');
+    casa_opt_text('Título Principal H1', 'casa_opt_home_hero_title', true);
+    casa_opt_text('Descripción Hero', 'casa_opt_home_hero_desc', true);
+    echo '</div>';
+
+    echo '<hr style="border:0; border-top:1px solid #e5e7eb; margin:5px 0;">';
+    
+    // 2. ESPACIOS
     echo '<div>';
     echo '<h3 style="margin:0 0 10px 0; color:#1f2937; border-left:3px solid #d4af37; padding-left:10px;">Header Página: Espacios</h3>';
     casa_opt_image('Imagen de Portada "Espacios"', 'casa_opt_espacios_portada');
+    casa_opt_text('Subtítulo Superior / Etiqueta (Ej. Exclusividad)', 'casa_opt_global_espacios_subtitle');
     casa_opt_text('Título H1 "Espacios"', 'casa_opt_global_espacios_title');
+    casa_opt_text('Descripción / Cita en Portada', 'casa_opt_global_espacios_desc', true);
     echo '</div>';
 
     echo '<hr style="border:0; border-top:1px solid #e5e7eb; margin:5px 0;">';
+    
+    // 3. RESTAURANTES
     echo '<div>';
     echo '<h3 style="margin:0 0 10px 0; color:#1f2937; border-left:3px solid #d4af37; padding-left:10px;">Header Página: Restaurantes</h3>';
     casa_opt_image('Imagen de Portada "Restaurantes"', 'casa_opt_restaurantes_portada');
+    casa_opt_text('Subtítulo Superior / Etiqueta (Ej. Alta cocina)', 'casa_opt_global_restaurantes_subtitle');
     casa_opt_text('Título H1 "Restaurantes"', 'casa_opt_global_restaurantes_title');
+    casa_opt_text('Descripción / Cita en Portada', 'casa_opt_global_restaurantes_desc', true);
     echo '</div>';
 
     echo '<hr style="border:0; border-top:1px solid #e5e7eb; margin:5px 0;">';
+    
+    // 4. EVENTOS
     echo '<div>';
     echo '<h3 style="margin:0 0 10px 0; color:#1f2937; border-left:3px solid #d4af37; padding-left:10px;">Header Página: Eventos</h3>';
     casa_opt_image('Imagen de Portada "Eventos"', 'casa_opt_eventos_portada');
+    casa_opt_text('Subtítulo Superior / Etiqueta (Ej. Celebraciones)', 'casa_opt_global_eventos_subtitle');
     casa_opt_text('Título H1 "Eventos"', 'casa_opt_global_eventos_title');
+    casa_opt_text('Descripción / Cita en Portada', 'casa_opt_global_eventos_desc', true);
     echo '</div>';
 
     echo '<hr style="border:0; border-top:1px solid #e5e7eb; margin:5px 0;">';
+    
+    // 5. GALERÍA
     echo '<div>';
     echo '<h3 style="margin:0 0 10px 0; color:#1f2937; border-left:3px solid #d4af37; padding-left:10px;">Header Página: Galería</h3>';
     casa_opt_image('Imagen de Portada "Galería"', 'casa_opt_galeria_portada');
+    casa_opt_text('Subtítulo Superior / Etiqueta (Ej. Nuestra Esencia)', 'casa_opt_galeria_subtitle');
+    casa_opt_text('Título H1 "Galería"', 'casa_opt_galeria_title');
+    casa_opt_text('Descripción / Cita en Portada', 'casa_opt_galeria_desc', true);
     echo '</div>';
 
     echo '<hr style="border:0; border-top:1px solid #e5e7eb; margin:5px 0;">';
+    
+    // 6. CONTACTO
     echo '<div>';
     echo '<h3 style="margin:0 0 10px 0; color:#1f2937; border-left:3px solid #d4af37; padding-left:10px;">Header Página: Contacto</h3>';
     casa_opt_image('Imagen de Portada "Contacto"', 'casa_opt_contacto_portada');
+    casa_opt_text('Subtítulo Superior / Etiqueta (Ej. Atención Exclusiva)', 'casa_opt_contacto_subtitle');
     casa_opt_text('Título H1 "Contacto"', 'casa_opt_contacto_title');
+    casa_opt_text('Descripción / Cita en Portada', 'casa_opt_contacto_desc', true);
+    echo '</div>';
+
+    echo '<hr style="border:0; border-top:1px solid #e5e7eb; margin:5px 0;">';
+    
+    // 7. QUIÉNES SOMOS
+    echo '<div>';
+    echo '<h3 style="margin:0 0 10px 0; color:#1f2937; border-left:3px solid #d4af37; padding-left:10px;">Header Página: Quiénes Somos (Historia y Legado)</h3>';
+    casa_opt_image('Imagen de Portada "Quiénes Somos"', 'casa_opt_nosotros_portada');
+    casa_opt_text('Subtítulo Superior / Etiqueta (Ej. Desde 1845)', 'casa_opt_nosotros_subtitle');
+    casa_opt_text('Título H1 "Quiénes Somos"', 'casa_opt_nosotros_title');
+    casa_opt_text('Descripción / Cita en Portada', 'casa_opt_nosotros_header_desc', true);
+    echo '</div>';
+
+    echo '<hr style="border:0; border-top:1px solid #e5e7eb; margin:5px 0;">';
+    
+    // 8. FONDO FOOTER
+    echo '<div>';
+    echo '<h3 style="margin:0 0 10px 0; color:#1f2937; border-left:3px solid #d4af37; padding-left:10px;">Fondo del Pie de Página (Footer Banner opcional)</h3>';
+    casa_opt_image('Imagen de Fondo para el Footer (Si no se elige, se mantiene fondo negro #080808)', 'casa_opt_footer_bg_image');
     echo '</div>';
     echo '</div>';
     echo '</div>';
@@ -386,24 +446,14 @@ function casa_admin_page_inicio() {
     casa_render_admin_header('Panel Casa: Página de Inicio (Textos, Historia y Reseñas)');
     
     echo '<div style="background:#fafafa; border:1px solid #eaeaea; border-radius:10px; padding:20px; margin-bottom:30px;">';
-    echo '<h2>1. Hero Principal (Banner Superior de Inicio)</h2>';
-    casa_opt_image('Imagen de Portada "Inicio"', 'casa_opt_home_hero_img');
-    casa_opt_text('Subtítulo Superior (Ej. Desde 1845)', 'casa_opt_home_hero_subtitle');
-    casa_opt_text('Título Principal H1', 'casa_opt_home_hero_title', true);
-    casa_opt_text('Descripción Hero', 'casa_opt_home_hero_desc', true);
-    echo '</div>';
-
-    echo '<div style="background:#fafafa; border:1px solid #eaeaea; border-radius:10px; padding:20px; margin-bottom:30px;">';
-    echo '<h2>2. Sección Historia y Legado (Presentación en Inicio)</h2>';
-    casa_opt_text('Subtítulo / Etiqueta de sección', 'casa_opt_nosotros_subtitle', true);
-    casa_opt_text('Título de la Sección (Ej. Quiénes Somos)', 'casa_opt_nosotros_title');
+    echo '<h2>1. Sección Historia y Legado (Presentación en Inicio)</h2>';
     casa_opt_editor('Descripción / Texto principal del recinto en Inicio', 'casa_opt_nosotros_desc');
     casa_opt_image('Imagen de Portada "Historia y Legado"', 'casa_opt_nosotros_hero_img');
     casa_opt_text('URL del Recorrido Virtual 3D (Iframe)', 'casa_opt_nosotros_virtual_tour');
     echo '</div>';
 
     echo '<div style="background:#fafafa; border:1px solid #eaeaea; border-radius:10px; padding:20px; margin-bottom:30px;">';
-    echo '<h2>3. Sección de Reseñas Verificadas de Google Maps</h2>';
+    echo '<h2>2. Sección de Reseñas Verificadas de Google Maps</h2>';
     casa_opt_text('Subtítulo (Ej. Experiencias Inolvidables)', 'casa_opt_home_reviews_subtitle');
     casa_opt_text('Título de Sección (Ej. Lo que dicen nuestros visitantes)', 'casa_opt_home_reviews_title');
     casa_opt_text('Enlace Oficial a Reseñas en Google Maps', 'casa_opt_google_maps_link');
@@ -716,6 +766,8 @@ function casa_admin_page_galeria() {
         <?php
         $etiquetas_raw = get_option('casa_opt_galeria_etiquetas', 'Bodas, Eventos Sociales, Convenciones, Arquitectura & Gastronomía');
         $etiquetas = array_map('trim', explode(',', $etiquetas_raw));
+        $tamanos = get_option('casa_opt_galeria_etiqueta_tamanos', array());
+        if (!is_array($tamanos)) $tamanos = array();
         ?>
 
         <div class="casa-section-box" id="etiquetas-galeria" style="margin-bottom:30px;">
@@ -739,6 +791,8 @@ function casa_admin_page_galeria() {
             <div class="casa-rest-grid">
                 <?php foreach ($etiquetas as $etiqueta) : 
                     if (empty($etiqueta)) continue;
+                    $slug = sanitize_title($etiqueta);
+                    $selected_tamano = isset($tamanos[$slug]) ? $tamanos[$slug] : 'grande';
                 ?>
                     <div class="casa-rest-card">
                         <div class="casa-rest-card-left">
@@ -750,7 +804,16 @@ function casa_admin_page_galeria() {
                                 <div class="casa-rest-title-row">
                                     <h3 class="casa-rest-title"><?php echo esc_html($etiqueta); ?></h3>
                                 </div>
-                                <p class="casa-rest-meta">Filtrado dinámico en tiempo real • Resolución recomendada: 1200×800 px</p>
+                                <p class="casa-rest-meta" style="margin-bottom:8px;">Filtrado dinámico en tiempo real • Resolución recomendada: 1200×800 px</p>
+                                <div style="display:flex; align-items:center; gap:8px; background:#f1f5f9; padding:6px 12px; border-radius:6px; border:1px solid #cbd5e1; width:fit-content;">
+                                    <strong style="font-size:12px; color:#334155;">📐 Tamaño de Tarjeta:</strong>
+                                    <select name="casa_opt_galeria_etiqueta_tamanos[<?php echo esc_attr($slug); ?>]" style="padding:4px 8px; border-radius:4px; border:1.5px solid #c5a059; font-size:12px; font-weight:700; color:#0f172a; background:#fff; cursor:pointer;">
+                                        <option value="chico" <?php selected($selected_tamano, 'chico'); ?>>▪️ Chico (25% Ancho / Cabe 1 Chico + 1 Grande + 1 Chico en una fila)</option>
+                                        <option value="mediano" <?php selected($selected_tamano, 'mediano'); ?>>▫️ Mediano (33% Ancho / Caben 3 tarjetas iguales por fila)</option>
+                                        <option value="grande" <?php selected($selected_tamano, 'grande'); ?>>⭐ Grande (50% Ancho / Caben 2 Grandes o 1 Grande + 2 Chicos en una fila)</option>
+                                        <option value="panoramico" <?php selected($selected_tamano, 'panoramico'); ?>>🌟 Panorámico (100% Ancho / 1 Tarjeta estelar por fila)</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="casa-rest-actions">

@@ -240,7 +240,7 @@ function casadepiedra_plug_and_play_setup() {
     // 4. Poblar Valores por Defecto del Panel Casa (Plug & Play)
     $panel_defaults = array(
         'casa_opt_global_logo' => 'https://casadepiedraleon.mx/wp-content/uploads/2023/09/Logo_Header.png',
-        'casa_opt_global_address' => 'Blvd. Juan Alonso de Torres 2002, Col. Valle del Campestre, León, Gto.',
+        'casa_opt_global_address' => 'Av Cerro Gordo 270, Casa de Piedra, 37120 León de los Aldama, Gto.',
         'casa_opt_global_phone' => '477 717 2600',
         'casa_opt_global_email' => 'eventos@casadepiedraleon.mx',
         'casa_opt_global_espacios_title' => 'Nuestros Espacios',
@@ -259,10 +259,29 @@ function casadepiedra_plug_and_play_setup() {
         'casa_opt_contacto_desc' => 'Comunícate con nosotros para agendar tu evento.',
         'casa_opt_contacto_map' => '',
         'casa_opt_nosotros_portada' => get_template_directory_uri() . '/assets/images/salon_principal_1779523069698.png',
+        'casa_opt_nosotros_subtitle' => 'Desde 1845',
+        'casa_opt_nosotros_title' => 'Quiénes Somos',
+        'casa_opt_nosotros_header_desc' => 'Donde la sofisticación contemporánea y el legado histórico se encuentran',
         'casa_opt_espacios_portada' => get_template_directory_uri() . '/assets/images/jardin_principal_1779523113451.png',
+        'casa_opt_global_espacios_subtitle' => 'Exclusividad',
+        'casa_opt_global_espacios_title' => 'Nuestros Espacios',
+        'casa_opt_global_espacios_desc' => 'Escenarios para grandes historias',
         'casa_opt_restaurantes_portada' => get_template_directory_uri() . '/assets/images/terraza_mezquite_1779523084857.png',
+        'casa_opt_global_restaurantes_subtitle' => 'Alta cocina',
+        'casa_opt_global_restaurantes_title' => 'El epítome gastronómico del Bajío',
+        'casa_opt_global_restaurantes_desc' => 'La cúspide de la gastronomía en el Bajío. Una experiencia inigualable que reúne la oferta gastronómica más exclusiva de la región.',
         'casa_opt_eventos_portada' => get_template_directory_uri() . '/assets/images/salon_pavorreales_1779523097528.png',
+        'casa_opt_global_eventos_subtitle' => 'Celebraciones',
+        'casa_opt_global_eventos_title' => 'Próximos Eventos',
+        'casa_opt_global_eventos_desc' => 'Experiencias únicas y celebraciones a tu medida.',
+        'casa_opt_galeria_portada' => get_template_directory_uri() . '/assets/images/jardin_principal_1779523113451.png',
+        'casa_opt_galeria_subtitle' => 'Nuestra Esencia',
+        'casa_opt_galeria_title' => 'Galería Oficial',
+        'casa_opt_galeria_desc' => 'Momentos inolvidables y celebraciones extraordinarias',
         'casa_opt_contacto_portada' => get_template_directory_uri() . '/assets/images/jardin_principal_1779523113451.png',
+        'casa_opt_contacto_subtitle' => 'Atención Exclusiva',
+        'casa_opt_contacto_title' => 'Contacto Oficial',
+        'casa_opt_contacto_desc' => 'Estamos a tu disposición para diseñar la celebración que mereces',
         'casa_opt_status_nosotros' => '1',
         'casa_opt_status_espacios' => '1',
         'casa_opt_status_restaurantes' => '1',
@@ -274,6 +293,12 @@ function casadepiedra_plug_and_play_setup() {
     foreach ($panel_defaults as $key => $value) {
         // Solo añade la opción si no existe, para no sobrescribir configuraciones del usuario
         add_option($key, $value);
+    }
+
+    // Asegurar que si en la base de datos de WordPress estaba guardada la dirección antigua errónea, se actualice a la oficial
+    $current_address = get_option('casa_opt_global_address', '');
+    if (empty($current_address) || strpos($current_address, 'Juan Alonso') !== false || strpos($current_address, 'Lomas del Campestre') !== false || strpos($current_address, 'Cerro Gordo 270, Casa de Piedra') === false) {
+        update_option('casa_opt_global_address', 'Av Cerro Gordo 270, Casa de Piedra, 37120 León de los Aldama, Gto.');
     }
 
     update_option('casadepiedra_fully_populated_v10_clean_6restaurantes', true);

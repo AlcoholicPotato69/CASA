@@ -5,16 +5,16 @@
  */
 ?>
 <!-- Quote Modal -->
-<div id="quote-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999; backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: clamp(0.75rem, 3vw, 1.5rem); box-sizing: border-box;">
+<div id="quote-modal-overlay" data-lenis-prevent="true" style="display: none; position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(0,0,0,0.88) !important; z-index: 9999999 !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 12px; box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain;">
     <style>
-        .quote-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        .quote-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
         @media (min-width: 640px) { .quote-grid { grid-template-columns: 1fr 1fr; } }
         .luxury-card-scroll::-webkit-scrollbar { width: 6px; }
         .luxury-card-scroll::-webkit-scrollbar-track { background: transparent; }
         .luxury-card-scroll::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.5); border-radius: 10px; }
         .luxury-card-scroll::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.8); }
         .quote-select option { background-color: #1a1a1a; color: #ffffff; }
-        .flatpickr-calendar { background: #1a1a1a !important; border: 1px solid rgba(255,255,255,0.1) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; }
+        .flatpickr-calendar { background: #1a1a1a !important; border: 1px solid rgba(255,255,255,0.1) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; z-index: 99999999 !important; }
         .flatpickr-day { color: #fff !important; }
         .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus, .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover, .flatpickr-day.selected.prevMonthDay, .flatpickr-day.startRange.prevMonthDay, .flatpickr-day.endRange.prevMonthDay { background: var(--color-accent) !important; border-color: var(--color-accent) !important; color: #000 !important; }
         .flatpickr-day.inRange { background: rgba(212, 175, 55, 0.2) !important; border-color: transparent !important; box-shadow: none !important; }
@@ -22,7 +22,7 @@
         .flatpickr-time input { color: #fff !important; }
         
         .iti { width: 100%; color: #000 !important; }
-        .iti__country-list { background-color: #1a1a1a !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.2) !important; border-radius: 8px !important; z-index: 99999 !important; text-align: left !important; }
+        .iti__country-list { background-color: #1a1a1a !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.2) !important; border-radius: 8px !important; z-index: 99999999 !important; text-align: left !important; }
         .iti__country.iti__highlight { background-color: rgba(255,255,255,0.1) !important; }
         .iti__divider { border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
         .iti__dial-code { color: #aaa !important; }
@@ -37,56 +37,58 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
-    <div class="luxury-card" style="position: relative; width: 100%; max-width: 620px; padding: 0; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; background: #0e0e0e; border: 1px solid rgba(212,175,55,0.4); border-radius: 20px; box-shadow: 0 25px 70px rgba(0,0,0,0.95), 0 0 40px rgba(212,175,55,0.15); margin: auto;">
-        <button id="close-quote-modal" style="position: absolute; top: 1rem; right: 1rem; background: rgba(0,0,0,0.5); border: none; color: #fff; font-size: 1.8rem; cursor: pointer; z-index: 10; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">&times;</button>
-        <div class="luxury-card-scroll" style="padding: 2.5rem 2rem; overflow-y: auto; flex: 1; box-sizing: border-box; width: 100%;">
-            <h3 class="text-h3" style="margin-bottom: 1rem; color: var(--color-accent); text-align: center; font-size: clamp(1.5rem, 4vw, 2rem);">Solicitar Cotización</h3>
+    <div class="luxury-card" style="position: relative; width: 100%; max-width: 660px; padding: 0; max-height: 94vh; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; background: #0e0e0e; border: 1px solid rgba(212,175,55,0.45); border-radius: 18px; box-shadow: 0 25px 70px rgba(0,0,0,0.95), 0 0 40px rgba(212,175,55,0.18); margin: auto;">
+        <button id="close-quote-modal" type="button" style="position: absolute; top: 0.8rem; right: 0.8rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(212,175,55,0.3); color: #fff; font-size: 1.4rem; cursor: pointer; z-index: 20; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='var(--color-accent)'; this.style.color='#000';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';">&times;</button>
+        
+        <div class="luxury-card-scroll" data-lenis-prevent="true" style="padding: 1.5rem 1.8rem; overflow-y: auto; overscroll-behavior: contain; flex: 1; box-sizing: border-box; width: 100%;">
+            <h3 class="text-h3" style="margin-bottom: 0.6rem; color: var(--color-accent); text-align: center; font-size: clamp(1.35rem, 3.2vw, 1.7rem); line-height: 1.2;">Solicitar Cotización</h3>
             <?php
             $horario_modal = get_option('casa_opt_global_office_hours', 'Lunes a Viernes de 9:00 am a 6:00 pm | Sábados de 9:00 am a 2:00 pm');
             ?>
-            <div style="background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.28); border-radius: 12px; padding: 0.65rem 1rem; margin-bottom: 1.5rem; text-align: center; color: rgba(255,255,255,0.92); font-size: 0.84rem; line-height: 1.4;">
-                <span style="color: var(--color-accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; display: block; margin-bottom: 2px;">Horario de Atención</span>
+            <div style="background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.28); border-radius: 8px; padding: 0.45rem 0.8rem; margin-bottom: 1rem; text-align: center; color: rgba(255,255,255,0.92); font-size: 0.78rem; line-height: 1.35;">
+                <span style="color: var(--color-accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; display: inline-block; margin-right: 6px;">🕒 Horario:</span>
                 <span><?php echo esc_html($horario_modal); ?></span>
             </div>
         
-            <form id="quote-form" style="display: flex; flex-direction: column; gap: 1.2rem;">
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; color: var(--color-accent); font-family: var(--font-body); font-size: 0.92rem; font-weight: 600;">Tipo de Solicitud / Categoría *</label>
-                    <select name="quote_category" id="quote_category" class="quote-select" required style="width: 100%; padding: 0.85rem; background: rgba(212,175,55,0.08); border: 1.5px solid var(--color-accent); color: #fff; border-radius: 10px; font-weight: 600; cursor: pointer;">
-                        <option value="cotizacion">Cotización de Espacios / Eventos</option>
-                        <option value="generales">Temas generales / Información</option>
-                        <option value="proveedores">Propuestas de proveedores</option>
-                        <option value="propuesta_eventos">Propuesta de eventos comerciales / corporativos</option>
-                    </select>
+            <form id="quote-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div class="quote-grid">
+                    <div>
+                        <label style="display: block; margin-bottom: 0.35rem; color: var(--color-accent); font-family: var(--font-body); font-size: 0.84rem; font-weight: 600;">Categoría de Solicitud *</label>
+                        <select name="quote_category" id="quote_category" class="quote-select" required style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(212,175,55,0.08); border: 1.5px solid var(--color-accent); color: #fff; border-radius: 8px; font-size: 0.86rem; font-weight: 600; cursor: pointer;">
+                            <option value="cotizacion">Cotización de Espacios / Eventos</option>
+                            <option value="generales">Temas generales / Información</option>
+                            <option value="proveedores">Propuestas de proveedores</option>
+                            <option value="propuesta_eventos">Propuesta de eventos corporativos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.35rem; color: rgba(255,255,255,0.85); font-family: var(--font-body); font-size: 0.84rem;">Teléfono de Contacto *</label>
+                        <input type="tel" id="quote_phone" name="quote_phone" required style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; font-size: 0.86rem;">
+                    </div>
                 </div>
 
                 <!-- Datos de Contacto comunes (siempre visibles) -->
                 <div class="quote-grid">
                     <div>
-                        <label style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.8); font-family: var(--font-body); font-size: 0.9rem;">Nombre Completo *</label>
-                        <input type="text" name="quote_name" required style="width: 100%; padding: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px;">
+                        <label style="display: block; margin-bottom: 0.35rem; color: rgba(255,255,255,0.85); font-family: var(--font-body); font-size: 0.84rem;">Nombre Completo *</label>
+                        <input type="text" name="quote_name" required placeholder="Ej. Roberto Martínez" style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; font-size: 0.86rem;">
                     </div>
                     <div>
-                        <label style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.8); font-family: var(--font-body); font-size: 0.9rem;">Correo *</label>
-                        <input type="email" name="quote_email" required style="width: 100%; padding: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px;">
+                        <label style="display: block; margin-bottom: 0.35rem; color: rgba(255,255,255,0.85); font-family: var(--font-body); font-size: 0.84rem;">Correo Electrónico *</label>
+                        <input type="email" name="quote_email" required placeholder="nombre@empresa.com" style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; font-size: 0.86rem;">
                     </div>
-                </div>
-
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.8); font-family: var(--font-body); font-size: 0.9rem;">Teléfono *</label>
-                    <input type="tel" id="quote_phone" name="quote_phone" required style="width: 100%; padding-top: 0.8rem; padding-bottom: 0.8rem; padding-right: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px;">
                 </div>
 
                 <!-- BLOQUE 1: Cotización de Espacios -->
-                <div id="fields-cotizacion" style="display: flex; flex-direction: column; gap: 1.2rem;">
+                <div id="fields-cotizacion" style="display: flex; flex-direction: column; gap: 0.75rem;">
                     <div class="quote-grid">
                         <div>
-                            <label style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.8); font-family: var(--font-body); font-size: 0.9rem;">Fecha de Evento *</label>
-                            <input type="text" name="quote_date" id="quote_date" placeholder="Selecciona fecha(s)" style="width: 100%; padding: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; cursor: pointer;">
+                            <label style="display: block; margin-bottom: 0.35rem; color: rgba(255,255,255,0.85); font-family: var(--font-body); font-size: 0.84rem;">Fecha del Evento *</label>
+                            <input type="text" name="quote_date" id="quote_date" placeholder="Selecciona fecha(s)" style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; font-size: 0.86rem; cursor: pointer;">
                         </div>
                         <div>
-                            <label style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.8); font-family: var(--font-body); font-size: 0.9rem;">Tipo de Evento *</label>
-                            <select name="quote_type" id="quote_type" class="quote-select" style="width: 100%; padding: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px;">
+                            <label style="display: block; margin-bottom: 0.35rem; color: rgba(255,255,255,0.85); font-family: var(--font-body); font-size: 0.84rem;">Tipo de Evento *</label>
+                            <select name="quote_type" id="quote_type" class="quote-select" style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; font-size: 0.86rem;">
                                 <option value="" disabled selected>Seleccione el tipo de evento</option>
                                 <option value="Boda">Boda</option>
                                 <option value="Festejos corporativos">Festejos corporativos</option>
@@ -100,8 +102,8 @@
 
                     <div class="quote-grid">
                         <div>
-                            <label style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.8); font-family: var(--font-body); font-size: 0.9rem;">Salón (Espacio) *</label>
-                            <select name="quote_salon" id="quote_salon" class="quote-select" style="width: 100%; padding: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; appearance: none;">
+                            <label style="display: block; margin-bottom: 0.35rem; color: rgba(255,255,255,0.85); font-family: var(--font-body); font-size: 0.84rem;">Salón o Espacio *</label>
+                            <select name="quote_salon" id="quote_salon" class="quote-select" style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; font-size: 0.86rem; appearance: none;">
                                 <option value="" disabled selected>Seleccione un salón</option>
                                 <?php
                                 $espacios = new WP_Query(array('post_type' => 'espacios', 'post_status' => 'publish', 'posts_per_page' => -1));
@@ -116,30 +118,30 @@
                             </select>
                         </div>
                         <div>
-                            <label style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.8); font-family: var(--font-body); font-size: 0.9rem;">Cantidad de Personas *</label>
-                            <select name="quote_capacity" id="quote_capacity" class="quote-select" style="width: 100%; padding: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; appearance: none; cursor: pointer;">
+                            <label style="display: block; margin-bottom: 0.35rem; color: rgba(255,255,255,0.85); font-family: var(--font-body); font-size: 0.84rem;">Capacidad / Personas *</label>
+                            <select name="quote_capacity" id="quote_capacity" class="quote-select" style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; font-size: 0.86rem; appearance: none; cursor: pointer;">
                                 <option value="" disabled selected>Primero elige un espacio</option>
                             </select>
-                            <div id="quote_capacity_warning" style="display: none; color: #fbbf24; font-size: 0.8rem; margin-top: 6px; line-height: 1.35; background: rgba(251, 191, 36, 0.1); padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(251, 191, 36, 0.3);">
-                                ⚠️ Por favor, elige primero un espacio para ver los rangos disponibles.
+                            <div id="quote_capacity_warning" style="display: none; color: #fbbf24; font-size: 0.76rem; margin-top: 4px; line-height: 1.3; background: rgba(251, 191, 36, 0.1); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(251, 191, 36, 0.3);">
+                                ⚠️ Elige primero un espacio para ver los rangos.
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <label id="label-comments" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.8); font-family: var(--font-body); font-size: 0.9rem;">Comentarios / Detalles *</label>
-                    <textarea name="quote_comments" id="quote_comments" rows="3" placeholder="Escribe aquí tu mensaje, detalles o consulta..." style="width: 100%; padding: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; resize: none;"></textarea>
+                    <label id="label-comments" style="display: block; margin-bottom: 0.35rem; color: rgba(255,255,255,0.85); font-family: var(--font-body); font-size: 0.84rem;">Comentarios / Detalles *</label>
+                    <textarea name="quote_comments" id="quote_comments" rows="2" placeholder="Escribe aquí tu consulta, horario deseado o requerimientos especiales..." style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; font-size: 0.86rem; resize: none;"></textarea>
                 </div>
 
-                <div id="quote-disclaimer" style="font-size: 0.8rem; color: rgba(255,255,255,0.6); font-family: var(--font-body); text-align: center; margin-top: 0.2rem;">
-                    <em>* El seleccionar una fecha no garantiza una reservación, la fecha real está sujeta a disponibilidad.</em>
+                <div id="quote-disclaimer" style="font-size: 0.75rem; color: rgba(255,255,255,0.55); font-family: var(--font-body); text-align: center; margin-top: 0.1rem; line-height: 1.3;">
+                    <em>* Al seleccionar una fecha verificaremos disponibilidad inmediata para tu evento.</em>
                 </div>
             
-            <button type="submit" id="quote-submit-btn" style="width: 100%; padding: 1rem; background: var(--color-accent); color: #000; border: none; cursor: pointer; border-radius: 9999px; font-weight: 600; font-family: var(--font-body); transition: transform 0.3s; margin-top: 0.5rem;">
+            <button type="submit" id="quote-submit-btn" style="width: 100%; padding: 0.75rem 1.5rem; background: var(--color-accent); color: #000; border: none; cursor: pointer; border-radius: 9999px; font-weight: 700; font-size: 0.94rem; font-family: var(--font-body); transition: all 0.25s; margin-top: 0.3rem; box-shadow: 0 4px 15px rgba(212,175,55,0.3);" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 20px rgba(212,175,55,0.45)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 15px rgba(212,175,55,0.3)';">
                 Enviar Solicitud
             </button>
-            <div id="quote-form-msg" style="text-align: center; margin-top: 0.5rem; font-family: var(--font-body); display: none; font-size: 0.9rem;"></div>
+            <div id="quote-form-msg" style="text-align: center; margin-top: 0.4rem; font-family: var(--font-body); display: none; font-size: 0.86rem;"></div>
         </form>
 
         <div id="quote-success-screen" style="display: none; text-align: center; padding: 2rem 0;">
@@ -308,6 +310,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!overlay) return;
         overlay.style.display = 'none';
         document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        if (window.lenis && typeof window.lenis.start === 'function') {
+            window.lenis.start();
+        }
         if (form) {
             form.style.display = 'flex';
             form.reset();
@@ -362,6 +368,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             overlay.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+            if (window.lenis && typeof window.lenis.stop === 'function') {
+                window.lenis.stop();
+            }
         };
 
         window.openQuoteModal = openQuoteModalForSalon;

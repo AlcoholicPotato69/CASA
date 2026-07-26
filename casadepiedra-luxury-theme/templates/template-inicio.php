@@ -1,15 +1,15 @@
 <?php
 /* Template Name: Plantilla de Inicio (Hero SPA) */
 get_header();
-$bg = has_post_thumbnail() ? get_the_post_thumbnail_url(null, 'full') : 'https://casadepiedraleon.mx/wp-content/uploads/2023/09/Fachada_Noche.jpg';
-$sub = get_post_meta(get_the_ID(), '_hero_subtitle', true) ?: 'Desde 1845';
-$title = get_post_meta(get_the_ID(), '_hero_title', true) ?: 'El recinto más exclusivo <br /> de León.';
-$desc = get_post_meta(get_the_ID(), '_hero_desc', true) ?: 'Arquitectura de época, lujo contemporáneo y servicio impecable para bodas, convenciones y eventos que hacen historia.';
+$bg = get_option('casa_opt_home_hero_img') ?: (has_post_thumbnail() ? get_the_post_thumbnail_url(null, 'full') : 'https://casadepiedraleon.mx/wp-content/uploads/2023/09/Fachada_Noche.jpg');
+$sub = get_option('casa_opt_home_hero_subtitle') ?: (get_post_meta(get_the_ID(), '_hero_subtitle', true) ?: 'Desde 1845');
+$title = get_option('casa_opt_home_hero_title') ?: (get_post_meta(get_the_ID(), '_hero_title', true) ?: 'El recinto más exclusivo <br /> de León.');
+$desc = get_option('casa_opt_home_hero_desc') ?: (get_post_meta(get_the_ID(), '_hero_desc', true) ?: 'Arquitectura de época, lujo contemporáneo y servicio impecable para bodas, convenciones y eventos que hacen historia.');
 ?>
-<section style="position: relative; min-height: 100vh; display: flex; align-items: center; padding-top: 10rem; overflow: hidden;">
-    <div style="position: absolute; inset: 0; z-index: -1;">
+<section style="position: relative; z-index: 2; min-height: 100vh; display: flex; align-items: center; padding-top: 10rem; overflow: hidden; background: #080808;">
+    <div style="position: absolute; inset: 0; z-index: 1;">
         <img id="hero-bg" src="<?php echo esc_url($bg); ?>" class="img-cover" />
-        <div style="position: absolute; inset: 0; background: rgba(5, 5, 5, 0.7);"></div>
+        <div style="position: absolute; inset: 0; background: rgba(8, 8, 8, 0.7);"></div>
     </div>
     <div class="container" style="position: relative; z-index: 10;">
         <div style="max-width: 900px;">

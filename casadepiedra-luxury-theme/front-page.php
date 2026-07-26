@@ -12,10 +12,10 @@ $hero_desc = get_option('casa_opt_home_hero_desc', 'El símbolo de prestigio en 
 $hero_image = get_option('casa_opt_home_hero_img') ?: get_template_directory_uri() . '/assets/images/salon_principal_1779523069698.png';
 ?>
 
-<section id="inicio" style="position: relative; min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; overflow: hidden; padding-top: 5rem;">
-    <div style="position: absolute; inset: 0; z-index: -1;">
+<section id="inicio" style="position: relative; z-index: 2; min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; overflow: hidden; padding-top: 5rem; background: #080808;">
+    <div style="position: absolute; inset: 0; z-index: 1;">
         <img src="<?php echo esc_url($hero_image); ?>" alt="Casa de Piedra" class="img-cover gs-zoom-in" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transform: scale(1.1); transition: transform 2.5s cubic-bezier(0.32, 0.72, 0, 1);" />
-        <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(5,5,5,0.3) 0%, rgba(5,5,5,0.6) 60%, #050505 100%);"></div>
+        <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(5,5,5,0.3) 0%, rgba(5,5,5,0.6) 60%, #080808 100%);"></div>
     </div>
 
     <div class="container" style="position: relative; z-index: 10;">
@@ -143,7 +143,7 @@ $hero_image = get_option('casa_opt_home_hero_img') ?: get_template_directory_uri
 $google_maps_pin = get_option('casa_opt_google_maps_link', 'https://www.google.com/maps/place/Casa+De+Piedra/@21.1511013,-101.6954442,3365m/data=!3m2!1e3!5s0x842bbf530842ac4b:0x4642591264eb2eec!4m6!3m5!1s0x842bbf53a2e4d0e3:0xfe1f47b7b2f6b0a3!8m2!3d21.1585368!4d-101.6992601!16s%2Fg%2F11f_b_l520?entry=ttu&g_ep=EgoyMDI2MDcwNy4wIKXMDSoASAFQAw%3D%3D#');
 $reviews_subtitle = get_option('casa_opt_home_reviews_subtitle', 'Experiencias Inolvidables');
 $reviews_title = get_option('casa_opt_home_reviews_title', 'Lo que dicen nuestros visitantes');
-$rev1_text = get_option('casa_opt_home_rev1_text', 'Celebrar nuestra boda en Hacienda Casa de Piedra fue la mejor decisión. El Jardín Principal es majestuoso, las vistas de la cantera iluminada de noche son mágicas y todo el servicio superó nuestras expectativas.');
+$rev1_text = get_option('casa_opt_home_rev1_text', 'Celebrar nuestra boda en Ex Hacienda Casa de Piedra fue la mejor decisión. El Jardín Principal es majestuoso, las vistas de la cantera iluminada de noche son mágicas y todo el servicio superó nuestras expectativas.');
 $rev1_author = get_option('casa_opt_home_rev1_author', 'Sofía & Alejandro M.');
 $rev2_text = get_option('casa_opt_home_rev2_text', 'Sin duda el referente gastronómico y arquitectónico del Bajío. Sus restaurantes ofrecen una calidad de alta cocina excepcional en un entorno histórico invaluable en León.');
 $rev2_author = get_option('casa_opt_home_rev2_author', 'Carlos Elizondo');

@@ -183,12 +183,33 @@ get_header();
 }
 </style>
 
-<div class="privacy-page-wrapper">
-    <div class="privacy-hero">
-        <span class="script-subtitle">Marco Legal y Confidencialidad</span>
-        <h1>Aviso de Privacidad</h1>
-        <div class="privacy-divider"></div>
+<?php $portada_url = get_template_directory_uri() . '/assets/images/jardin_principal_1779523113451.png'; ?>
+<section style="position: relative; z-index: 2; width: 100%; height: clamp(400px, 48vh, 550px); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #080808;">
+    <img src="<?php echo esc_url($portada_url); ?>" alt="Aviso de Privacidad Portada" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.68);" class="gs-zoom-in" />
+    <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,8,8,0.2) 0%, rgba(8,8,8,0.55) 75%, #080808 100%); z-index: 2; pointer-events: none;"></div>
+    
+    <div style="position: relative; z-index: 3; text-align: center; padding: 40px clamp(1rem, 4vw, 3rem) 0; max-width: 900px; margin: 0 auto;">
+        <span class="text-script" style="color: var(--color-accent); font-size: 1.4rem; display: block; margin-bottom: 0.2rem;">Marco Legal &amp; Confidencialidad</span>
+        <h1 style="color: #fff; font-size: clamp(2.3rem, 4.5vw, 3.6rem); margin: 0 0 0.6rem 0; font-family: var(--font-heading); line-height: 1.1; text-shadow: 0 10px 30px rgba(0,0,0,0.85);">Aviso de Privacidad</h1>
+        
+        <!-- Ornament -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin: 0.8rem 0;">
+            <span style="height: 1px; width: 50px; background: linear-gradient(to right, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+            <span style="color: var(--color-accent); font-size: 0.85rem;">✦</span>
+            <span style="height: 1px; width: 50px; background: linear-gradient(to left, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+        </div>
+
+        <p style="color: #eaeaea; font-size: clamp(1.1rem, 2vw, 1.4rem); font-family: var(--font-heading); font-style: italic; margin: 0.5rem auto 0.8rem; line-height: 1.4; text-shadow: 0 4px 15px rgba(0,0,0,0.85);">
+            &ldquo;Protección integral de datos personales conforme al marco normativo vigente&rdquo;
+        </p>
+
+        <span style="color: var(--color-accent); font-size: 0.74rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.9); display: block; margin-top: 0.4rem;">
+            Ex Hacienda Casa de Piedra &bull; Transparencia Oficial
+        </span>
     </div>
+</section>
+
+<div class="privacy-page-wrapper" style="padding-top: 2rem;">
 
     <div class="privacy-container">
         <!-- Introducción & Grupo AlCon -->
@@ -208,7 +229,7 @@ get_header();
         <div class="privacy-section">
             <h2>Responsable del tratamiento</h2>
             <p>
-                El responsable de recabar sus datos personales, del uso que se les dé y de la protección de los mismos es: <strong>Inmobiliaria Granjas de la Loma SAPI de CV</strong> (en lo sucesivo: <strong>IGL</strong>), con domicilio ubicado en <strong>Blvd. Juan Alonso de Torres # 2002 int. 3001, Col. Valle del Campestre, C.P. 37125, en la ciudad de León, Guanajuato</strong>.
+                El responsable de recabar sus datos personales, del uso que se les dé y de la protección de los mismos es: <strong>Inmobiliaria Granjas de la Loma SAPI de CV</strong> (en lo sucesivo: <strong>IGL</strong>), con domicilio ubicado en <strong>Av Cerro Gordo 270, Casa de Piedra, 37120 León de los Aldama, Gto.</strong>
             </p>
         </div>
 
@@ -315,7 +336,7 @@ get_header();
                 </div>
                 <div class="privacy-contact-item">
                     <label>Domicilio</label>
-                    <span>Blvd. Juan Alonso de Torres # 2002 int. 3001, Col. Valle del Campestre, C.P. 37125, León, Guanajuato.</span>
+                    <span>Av Cerro Gordo 270, Casa de Piedra, 37120 León de los Aldama, Gto.</span>
                 </div>
                 <div class="privacy-contact-item">
                     <label>Correo Electrónico</label>

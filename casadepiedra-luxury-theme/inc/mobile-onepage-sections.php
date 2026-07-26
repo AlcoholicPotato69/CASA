@@ -145,23 +145,20 @@
     <?php if (get_option('casa_opt_status_espacios', '1') === '1') : ?>
     <section id="espacios" class="mobile-section-block">
         <div class="container">
-            <div class="mobile-section-header">
+            <div class="mobile-section-header" style="margin-bottom: 2rem;">
                 <span class="text-script">Exclusividad</span>
                 <h2 class="text-h2">Nuestros Espacios</h2>
-            </div>
-        </div>
-        <!-- Luxury Editorial Intro Block (Full Screen Width) -->
-        <div class="luxury-editorial-intro" style="margin-bottom: 2.5rem;">
-            <div class="luxury-intro-ornament">
-                <span class="line-left"></span>
-                <span class="diamond-icon">✦</span>
-                <span class="line-right"></span>
-            </div>
-            <blockquote class="luxury-intro-quote">
-                &ldquo;<?php echo esc_html(ucfirst(get_option('casa_opt_global_espacios_desc', 'Escenarios para grandes historias'))); ?>&rdquo;
-            </blockquote>
-            <div class="luxury-intro-footer">
-                <span class="small-caps-label">Hacienda Casa de Piedra</span>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin: 0.6rem 0;">
+                    <span style="height: 1px; width: 35px; background: rgba(212,175,55,0.6); display: inline-block;"></span>
+                    <span style="color: var(--color-accent); font-size: 0.75rem;">✦</span>
+                    <span style="height: 1px; width: 35px; background: rgba(212,175,55,0.6); display: inline-block;"></span>
+                </div>
+                <p style="color: #ddd; font-size: 1.05rem; font-family: var(--font-heading); font-style: italic; margin: 0.4rem auto; max-width: 500px;">
+                    &ldquo;<?php echo esc_html(ucfirst(get_option('casa_opt_global_espacios_desc', 'Escenarios para grandes historias'))); ?>&rdquo;
+                </p>
+                <span style="color: var(--color-accent); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; display: block; margin-top: 0.4rem;">
+                    Ex Hacienda Casa de Piedra &bull; Exclusividad &amp; Elegancia
+                </span>
             </div>
         </div>
         <div class="container">
@@ -221,23 +218,20 @@
     <?php if (get_option('casa_opt_status_restaurantes', '1') === '1') : ?>
     <section id="restaurantes" class="mobile-section-block">
         <div class="container">
-            <div class="mobile-section-header">
+            <div class="mobile-section-header" style="margin-bottom: 2rem;">
                 <span class="text-script"><?php echo esc_html(get_option('casa_opt_global_restaurantes_subtitle', 'Alta cocina')); ?></span>
                 <h2 class="text-h2">Restaurantes</h2>
-            </div>
-        </div>
-        <!-- Luxury Editorial Intro Block (Full Screen Width) -->
-        <div class="luxury-editorial-intro" style="margin-bottom: 2.5rem;">
-            <div class="luxury-intro-ornament">
-                <span class="line-left"></span>
-                <span class="diamond-icon">✦</span>
-                <span class="line-right"></span>
-            </div>
-            <blockquote class="luxury-intro-quote">
-                &ldquo;<?php echo esc_html(ucfirst(get_option('casa_opt_global_restaurantes_desc', 'La cúspide de la gastronomía en el Bajío. Una experiencia inigualable que reúne la oferta gastronómica más exclusiva de la región, ofreciendo un viaje de sabores únicos.'))); ?>&rdquo;
-            </blockquote>
-            <div class="luxury-intro-footer">
-                <span class="small-caps-label">Hacienda Casa de Piedra &bull; Alta Cocina</span>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin: 0.6rem 0;">
+                    <span style="height: 1px; width: 35px; background: rgba(212,175,55,0.6); display: inline-block;"></span>
+                    <span style="color: var(--color-accent); font-size: 0.75rem;">✦</span>
+                    <span style="height: 1px; width: 35px; background: rgba(212,175,55,0.6); display: inline-block;"></span>
+                </div>
+                <p style="color: #ddd; font-size: 1.05rem; font-family: var(--font-heading); font-style: italic; margin: 0.4rem auto; max-width: 500px;">
+                    &ldquo;<?php echo esc_html(ucfirst(get_option('casa_opt_global_restaurantes_desc', 'La cúspide de la gastronomía en el Bajío. Una experiencia inigualable que reúne la oferta gastronómica más exclusiva de la región, ofreciendo un viaje de sabores únicos.'))); ?>&rdquo;
+                </p>
+                <span style="color: var(--color-accent); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; display: block; margin-top: 0.4rem;">
+                    Ex Hacienda Casa de Piedra &bull; Alta Cocina
+                </span>
             </div>
         </div>
         <div class="container">

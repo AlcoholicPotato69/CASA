@@ -37,23 +37,33 @@ if (!empty($current_ids)) {
 
 ?>
 
-<?php if ($portada_url): ?>
-<section style="position: relative; width: 100%; height: 70vh; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 4rem;">
-    <img src="<?php echo esc_url($portada_url); ?>" alt="Galería Portada" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: -1; filter: brightness(0.7);" class="gs-zoom-in" />
-    <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10,10,10,0.2) 0%, rgba(10,10,10,0.5) 70%, var(--color-bg, #0a0a0a) 100%); z-index: 0; pointer-events: none;"></div>
-    <div style="position: relative; z-index: 1; text-align: center;">
-        <span class="text-script reveal-text" style="color: #fff;">Nuestra Esencia</span>
-        <h1 class="text-hero reveal-text" style="color: #fff; text-shadow: 0 10px 30px rgba(0,0,0,0.5);">Galería</h1>
+<?php
+$portada_url = get_option('casa_opt_galeria_portada') ?: get_template_directory_uri() . '/assets/images/jardin_principal_1779523113451.png';
+?>
+<section style="position: relative; z-index: 2; width: 100%; height: clamp(400px, 48vh, 550px); display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 2.5rem; background: #080808;">
+    <img src="<?php echo esc_url($portada_url); ?>" alt="Galería Portada" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.68);" class="gs-zoom-in" />
+    <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,8,8,0.2) 0%, rgba(8,8,8,0.55) 75%, #080808 100%); z-index: 2; pointer-events: none;"></div>
+    
+    <div style="position: relative; z-index: 3; text-align: center; padding: 40px clamp(1rem, 4vw, 3rem) 0; max-width: 900px; margin: 0 auto;">
+        <span class="text-script" style="color: var(--color-accent); font-size: 1.4rem; display: block; margin-bottom: 0.2rem;"><?php echo esc_html(get_option('casa_opt_galeria_subtitle', 'Nuestra Esencia')); ?></span>
+        <h1 style="color: #fff; font-size: clamp(2.3rem, 4.5vw, 3.6rem); margin: 0 0 0.6rem 0; font-family: var(--font-heading); line-height: 1.1; text-shadow: 0 10px 30px rgba(0,0,0,0.85);"><?php echo esc_html(get_option('casa_opt_galeria_title', 'Galería Oficial')); ?></h1>
+        
+        <!-- Ornament -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin: 0.8rem 0;">
+            <span style="height: 1px; width: 50px; background: linear-gradient(to right, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+            <span style="color: var(--color-accent); font-size: 0.85rem;">✦</span>
+            <span style="height: 1px; width: 50px; background: linear-gradient(to left, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+        </div>
+
+        <p style="color: #eaeaea; font-size: clamp(1.1rem, 2vw, 1.4rem); font-family: var(--font-heading); font-style: italic; margin: 0.5rem auto 0.8rem; line-height: 1.4; text-shadow: 0 4px 15px rgba(0,0,0,0.85);">
+            &ldquo;<?php echo esc_html(ucfirst(get_option('casa_opt_galeria_desc', 'Momentos inolvidables y celebraciones extraordinarias'))); ?>&rdquo;
+        </p>
+
+        <span style="color: var(--color-accent); font-size: 0.74rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.9); display: block; margin-top: 0.4rem;">
+            Ex Hacienda Casa de Piedra &bull; Colección Visual
+        </span>
     </div>
 </section>
-<?php else: ?>
-<div style="padding-top: clamp(8rem, 15vh, 12rem); padding-bottom: 2rem;">
-    <div class="container text-center">
-        <span class="text-script" style="font-size: 3rem;">Galería</span>
-        <h2 class="text-h2" style="margin-top: 1rem;">Momentos inolvidables.</h2>
-    </div>
-</div>
-<?php endif; ?>
 
 <div class="container" style="padding-bottom: 6rem;">
     <?php
@@ -97,12 +107,23 @@ if (!empty($current_ids)) {
 
     <!-- VISTA 1: TARJETAS DE ETIQUETA / CATEGORÍA DINÁMICAS DESDE EL BACKEND -->
     <div id="gallery-categories-view">
-        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 1.5rem; width: 100%;">
+        <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; width: 100%;">
             <?php 
             $cat_index = 0;
-            $total_cats = count($categories);
+            $tamanos = get_option('casa_opt_galeria_etiqueta_tamanos', array());
+            if (!is_array($tamanos)) $tamanos = array();
             foreach ($categories as $slug => $cat): 
-                $col_span = ($cat_index < 3 || $total_cats <= 3) ? 'grid-column: span 2;' : 'grid-column: span 3;';
+                $selected_tamano = isset($tamanos[$slug]) ? $tamanos[$slug] : 'grande';
+                if ($selected_tamano === 'chico') {
+                    $col_span = 'grid-column: span 3;'; // 25% ancho (cabe 1 chico + 1 grande + 1 chico en la misma fila)
+                } elseif ($selected_tamano === 'mediano') {
+                    $col_span = 'grid-column: span 4;'; // 33% ancho (caben 3 en una fila)
+                } elseif ($selected_tamano === 'panoramico' || $selected_tamano === 'completo') {
+                    $col_span = 'grid-column: span 12;'; // 100% ancho panorámico
+                } else {
+                    // 'grande' por defecto (50% ancho, caben 2 grandes o 1 grande + 2 chicos)
+                    $col_span = 'grid-column: span 6;';
+                }
                 $cat_index++;
             ?>
             <div class="gallery-tag-card luxury-card group" data-category="<?php echo esc_attr($slug); ?>" style="<?php echo $col_span; ?> position: relative; height: clamp(220px, 28vh, 300px); cursor: pointer; overflow: hidden; border-radius: 16px; background-color: #111111; border: 1px solid rgba(212,175,55,0.22); display: flex; flex-direction: column; justify-content: flex-end; padding: 1.8rem; box-shadow: 0 15px 45px rgba(0,0,0,0.8); z-index: 1; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;" onmouseover="this.style.transform='translateY(-6px)'; this.style.borderColor='rgba(212,175,55,0.65)'; this.style.boxShadow='0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(212,175,55,0.2)'; const img = this.querySelector('img'); if(img) img.style.transform='scale(1.05)'; const badge = this.querySelector('.venue-arrow-badge'); if(badge){ badge.style.opacity='1'; badge.style.transform='none'; }" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(212,175,55,0.22)'; this.style.boxShadow='0 15px 45px rgba(0,0,0,0.8)'; const img = this.querySelector('img'); if(img) img.style.transform='scale(1)'; const badge = this.querySelector('.venue-arrow-badge'); if(badge){ badge.style.opacity='0'; badge.style.transform='translateX(-10px) translateY(10px) scale(0.6)'; }">
@@ -126,13 +147,13 @@ if (!empty($current_ids)) {
         <style>
             @media (max-width: 1024px) {
                 #gallery-categories-view > div {
-                    grid-template-columns: repeat(2, 1fr) !important;
+                    grid-template-columns: repeat(12, 1fr) !important;
                 }
                 #gallery-categories-view .gallery-tag-card {
-                    grid-column: span 1 !important;
+                    grid-column: span 6 !important;
                 }
-                #gallery-categories-view .gallery-tag-card:last-child {
-                    grid-column: span 2 !important;
+                #gallery-categories-view .gallery-tag-card[style*="span 12"] {
+                    grid-column: span 12 !important;
                 }
             }
             @media (max-width: 640px) {

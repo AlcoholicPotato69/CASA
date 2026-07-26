@@ -149,17 +149,41 @@ body::after,
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* Las tarjetas tienen fondo negro liso cristalino y se sitúan por encima del fondo granulado */
+/* Las tarjetas y banners principales tienen fondo sólido y z-index superior al fondo granulado para evitar traslucidez */
 .luxury-card,
 .google-review-card,
 .other-space-card,
 .espacio-panel,
 .luxury-info-panel,
 .rest-col-info > div,
-.espacio-col-info > div {
+.espacio-col-info > div,
+.luxury-editorial-intro,
+.privacy-hero,
+.salon-banner,
+.cdp-hero,
+.banner-section,
+.venue-banner {
   position: relative !important;
   z-index: 2 !important;
   background: #111111 !important;
+}
+
+/* Regla global para asegurar que los banners/héroes en la parte superior tengan fondo 100% sólido, cero traslucidez y cubran el granulado */
+section[style*="height: 38vh"],
+section[style*="height: 40vh"],
+section[style*="height: 42vh"],
+section[style*="height: 45vh"],
+section[style*="height: 50vh"],
+section[style*="height: 55vh"],
+section[style*="height: 60vh"],
+section[style*="height: 70vh"],
+section[style*="height: 80vh"],
+section[style*="height: 100vh"],
+section[style*="clamp(340px"],
+section[style*="clamp(320px"] {
+  position: relative !important;
+  z-index: 2 !important;
+  background-color: #080808 !important;
 }
 
 /* Typography Utilities - Luxury Editorial Proportions */
@@ -492,19 +516,20 @@ button[style*="background: var(--color-accent)"]:hover,
    Luxury Editorial Intro & Subtitle Framing (Espacios & Restaurantes)
    ========================================================================== */
 .luxury-editorial-intro {
-    position: relative;
+    position: relative !important;
+    z-index: 2 !important;
     width: 100%;
     max-width: 100%;
     margin: -1.5rem 0 4.5rem 0;
     padding: 3.2rem clamp(1.5rem, 6vw, 8rem);
     text-align: center;
-    background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.09) 0%, rgba(10, 10, 10, 0.5) 75%), linear-gradient(180deg, rgba(16, 16, 16, 0.88) 0%, rgba(8, 8, 8, 0.95) 100%);
+    background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.12) 0%, #0e0e0e 75%), #0a0a0a !important;
     border-top: 1px solid rgba(212, 175, 55, 0.35);
     border-bottom: 1px solid rgba(212, 175, 55, 0.35);
     border-left: none;
     border-right: none;
     border-radius: 0;
-    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(212, 175, 55, 0.03);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), inset 0 0 40px rgba(212, 175, 55, 0.03);
     box-sizing: border-box;
     overflow: hidden;
 }

@@ -3,35 +3,6 @@
 <head>
     <meta charset="<?php bloginfo('charset'); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Casa de Piedra León — La sede más emblemática de León, Guanajuato para bodas, eventos sociales, congresos corporativos y alta gastronomía desde 1845." />
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
-    <meta property="og:title" content="<?php wp_title('|', true, 'right'); bloginfo('name'); ?>" />
-    <meta property="og:description" content="Recinto histórico en León, Guanajuato para eventos sociales y corporativos de alto nivel, salones exclusivos y restaurantes de alta cocina." />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="es_MX" />
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "EventVenue",
-      "name": "Casa de Piedra",
-      "url": "<?php echo esc_url(home_url('/')); ?>",
-      "description": "Sede histórica para bodas, eventos sociales y corporativos de alto nivel en León, Guanajuato.",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Av Cerro Gordo 270, Casa de Piedra",
-        "addressLocality": "León de los Aldama",
-        "addressRegion": "Gto",
-        "postalCode": "37120",
-        "addressCountry": "MX"
-      },
-      "telephone": "+524777172600",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "1420"
-      }
-    }
-    </script>
     <?php wp_head(); ?>
     <script>
     (function() {

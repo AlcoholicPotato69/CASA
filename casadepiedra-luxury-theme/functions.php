@@ -305,7 +305,7 @@ add_filter('site_icon_meta_tags', '__return_empty_array', 999);
 // Output del Favicon Inicial Transparente de Casa de Piedra en <head>
 add_action('wp_head', function() {
     $fav_init = get_template_directory_uri() . '/assets/images/favicons/favicon-1.png';
-    echo "\n<!-- Hacienda Casa de Piedra Favicon Oficial -->\n";
+    echo "\n<!-- Ex Hacienda Casa de Piedra Favicon Oficial -->\n";
     echo '<link id="casa-dynamic-favicon" rel="icon" type="image/png" href="' . esc_url($fav_init) . '" />' . "\n";
 }, 1);
 
@@ -609,6 +609,7 @@ function casadepiedra_get_reserva_url($post_id) {
 
 // 5. Cargar Panel de Administración Global
 require_once get_template_directory() . '/inc/admin-panel.php';
+require_once get_template_directory() . '/inc/seo.php';
 
 // 7. Meta Box para Galería (Restaurantes y Espacios)
 function casadepiedra_add_gallery_meta() { 
@@ -1262,7 +1263,7 @@ function casa_handle_send_cotizacion() {
                 <p style="margin-top: 30px;">Si necesitas atención inmediata, no dudes en llamarnos al <a href="tel:4777172600" style="color: #d4af37;">477 717 2600</a>.</p>
             </div>
             <div class="footer">
-                Hacienda Casa de Piedra<br>
+                Ex Hacienda Casa de Piedra<br>
                 León, Guanajuato, México
             </div>
         </div>
@@ -1424,3 +1425,17 @@ add_filter('document_title_parts', function($title) {
     }
     return $title;
 }, 999);
+
+/**
+ * Auto-corrección permanente del domicilio oficial si existía información anterior errónea en base de datos.
+ */
+add_action('init', function() {
+    $curr_addr = get_option('casa_opt_global_address', '');
+    if (empty($curr_addr) || stripos($curr_addr, 'Alonso') !== false || stripos($curr_addr, 'Lomas') !== false || stripos($curr_addr, '2002') !== false || stripos($curr_addr, 'Valle del Campestre') !== false) {
+        update_option('casa_opt_global_address', 'Av Cerro Gordo 270, Casa de Piedra, 37120 León de los Aldama, Gto.');
+    }
+    $rev1 = get_option('casa_opt_home_rev1_text', '');
+    if (!empty($rev1) && stripos($rev1, 'Hacienda Casa de Piedra') !== false && stripos($rev1, 'Ex Hacienda') === false && stripos($rev1, 'Ex-Hacienda') === false) {
+        update_option('casa_opt_home_rev1_text', str_ireplace('Hacienda Casa de Piedra', 'Ex Hacienda Casa de Piedra', $rev1));
+    }
+});

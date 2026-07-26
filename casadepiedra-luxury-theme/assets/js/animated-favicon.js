@@ -1,5 +1,5 @@
 /**
- * Hacienda Casa de Piedra - Favicon Animado con Transmutación Continua
+ * Ex Hacienda Casa de Piedra - Favicon Animado con Transmutación Continua
  * Utiliza exactamente las imágenes oficiales proporcionadas por el usuario con fondo transparente,
  * transmutando suavemente de una imagen a otra en ciclos de 2.5 segundos.
  */

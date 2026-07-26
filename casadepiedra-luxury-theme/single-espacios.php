@@ -23,15 +23,34 @@ get_header(); ?>
 ?>
 
 <!-- 1. BANNER HASTA ARRIBA CON EL NOMBRE DEL ESPACIO (100% ANCHO) -->
-<section style="position: relative; width: 100%; height: clamp(340px, 42vh, 480px); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #080808;">
-    <img src="<?php echo esc_url($hero_img); ?>" alt="<?php the_title_attribute(); ?>" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.78); transform: scale(1.03);" />
-    <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,8,8,0.15) 0%, rgba(8,8,8,0.42) 75%, #080808 100%); z-index: 1; pointer-events: none;"></div>
+<?php
+$subt_esp = get_post_meta(get_the_ID(), '_espacio_subt', true) ?: 'Exclusividad & Elegancia';
+$desc_esp = has_excerpt() ? wp_strip_all_tags(get_the_excerpt()) : 'Un escenario incomparable para celebraciones memorables en el corazón de León.';
+?>
+<section style="position: relative; z-index: 2; width: 100%; height: clamp(400px, 48vh, 550px); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #080808;">
+    <img src="<?php echo esc_url($hero_img); ?>" alt="<?php the_title_attribute(); ?>" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.68);" class="gs-zoom-in" />
+    <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,8,8,0.2) 0%, rgba(8,8,8,0.55) 75%, #080808 100%); z-index: 2; pointer-events: none;"></div>
 
-    <div style="position: relative; z-index: 2; text-align: center; padding: 0 clamp(1rem, 4vw, 3rem); max-width: 1100px; margin-top: 30px;">
-        <span class="text-script" style="color: var(--color-accent); font-size: 1.4rem;">Casa de Piedra</span>
-        <h1 style="color: #fff; font-size: clamp(2.3rem, 5vw, 4.2rem); margin: 0.3rem 0; font-family: var(--font-heading); line-height: 1.1; text-shadow: 0 10px 30px rgba(0,0,0,0.85);">
+    <div style="position: relative; z-index: 3; text-align: center; padding: 40px clamp(1rem, 4vw, 3rem) 0; max-width: 900px; margin: 0 auto;">
+        <span class="text-script" style="color: var(--color-accent); font-size: 1.4rem; display: block; margin-bottom: 0.2rem;"><?php echo esc_html($subt_esp); ?></span>
+        <h1 style="color: #fff; font-size: clamp(2.3rem, 5vw, 4.2rem); margin: 0 0 0.6rem 0; font-family: var(--font-heading); line-height: 1.1; text-shadow: 0 10px 30px rgba(0,0,0,0.85);">
             <?php the_title(); ?>
         </h1>
+        
+        <!-- Ornament -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin: 0.8rem 0;">
+            <span style="height: 1px; width: 50px; background: linear-gradient(to right, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+            <span style="color: var(--color-accent); font-size: 0.85rem;">✦</span>
+            <span style="height: 1px; width: 50px; background: linear-gradient(to left, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+        </div>
+
+        <p style="color: #eaeaea; font-size: clamp(1.1rem, 2vw, 1.4rem); font-family: var(--font-heading); font-style: italic; margin: 0.5rem auto 0.8rem; line-height: 1.4; text-shadow: 0 4px 15px rgba(0,0,0,0.85);">
+            &ldquo;<?php echo esc_html(ucfirst($desc_esp)); ?>&rdquo;
+        </p>
+
+        <span style="color: var(--color-accent); font-size: 0.74rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.9); display: block; margin-top: 0.4rem;">
+            Ex Hacienda Casa de Piedra &bull; Venue Exclusivo
+        </span>
     </div>
 </section>
 
