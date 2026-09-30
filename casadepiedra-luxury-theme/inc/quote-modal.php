@@ -11,13 +11,13 @@
         @media (min-width: 640px) { .quote-grid { grid-template-columns: 1fr 1fr; } }
         .luxury-card-scroll::-webkit-scrollbar { width: 6px; }
         .luxury-card-scroll::-webkit-scrollbar-track { background: transparent; }
-        .luxury-card-scroll::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.5); border-radius: 10px; }
-        .luxury-card-scroll::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.8); }
+        .luxury-card-scroll::-webkit-scrollbar-thumb { background: rgba(193, 98, 30, 0.5); border-radius: 10px; }
+        .luxury-card-scroll::-webkit-scrollbar-thumb:hover { background: rgba(193, 98, 30, 0.8); }
         .quote-select option { background-color: #1a1a1a; color: #ffffff; }
         .flatpickr-calendar { background: #1a1a1a !important; border: 1px solid rgba(255,255,255,0.1) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; z-index: 99999999 !important; }
         .flatpickr-day { color: #fff !important; }
         .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus, .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover, .flatpickr-day.selected.prevMonthDay, .flatpickr-day.startRange.prevMonthDay, .flatpickr-day.endRange.prevMonthDay { background: var(--color-accent) !important; border-color: var(--color-accent) !important; color: #000 !important; }
-        .flatpickr-day.inRange { background: rgba(212, 175, 55, 0.2) !important; border-color: transparent !important; box-shadow: none !important; }
+        .flatpickr-day.inRange { background: rgba(193, 98, 30, 0.2) !important; border-color: transparent !important; box-shadow: none !important; }
         .flatpickr-month, .flatpickr-weekday { color: #fff !important; fill: #fff !important; }
         .flatpickr-time input { color: #fff !important; }
         
@@ -37,15 +37,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
-    <div class="luxury-card" style="position: relative; width: 100%; max-width: 660px; padding: 0; max-height: 94vh; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; background: #0e0e0e; border: 1px solid rgba(212,175,55,0.45); border-radius: 18px; box-shadow: 0 25px 70px rgba(0,0,0,0.95), 0 0 40px rgba(212,175,55,0.18); margin: auto;">
-        <button id="close-quote-modal" type="button" style="position: absolute; top: 0.8rem; right: 0.8rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(212,175,55,0.3); color: #fff; font-size: 1.4rem; cursor: pointer; z-index: 20; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='var(--color-accent)'; this.style.color='#000';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';">&times;</button>
+    <div class="luxury-card" style="position: relative; width: 100%; max-width: 660px; padding: 0; max-height: 94vh; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; background: #0e0e0e; border: 1px solid rgba(193,98,30,0.45); border-radius: 18px; box-shadow: 0 25px 70px rgba(0,0,0,0.95), 0 0 40px rgba(193,98,30,0.18); margin: auto;">
+        <button id="close-quote-modal" type="button" style="position: absolute; top: 0.8rem; right: 0.8rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(193,98,30,0.3); color: #fff; font-size: 1.4rem; cursor: pointer; z-index: 20; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='var(--color-accent)'; this.style.color='#000';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';">&times;</button>
         
         <div class="luxury-card-scroll" data-lenis-prevent="true" style="padding: 1.5rem 1.8rem; overflow-y: auto; overscroll-behavior: contain; flex: 1; box-sizing: border-box; width: 100%;">
             <h3 class="text-h3" style="margin-bottom: 0.6rem; color: var(--color-accent); text-align: center; font-size: clamp(1.35rem, 3.2vw, 1.7rem); line-height: 1.2;">Solicitar Cotización</h3>
             <?php
             $horario_modal = get_option('casa_opt_global_office_hours', 'Lunes a Viernes de 9:00 am a 6:00 pm | Sábados de 9:00 am a 2:00 pm');
             ?>
-            <div style="background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.28); border-radius: 8px; padding: 0.45rem 0.8rem; margin-bottom: 1rem; text-align: center; color: rgba(255,255,255,0.92); font-size: 0.78rem; line-height: 1.35;">
+            <div style="background: rgba(193,98,30,0.08); border: 1px solid rgba(193,98,30,0.28); border-radius: 8px; padding: 0.45rem 0.8rem; margin-bottom: 1rem; text-align: center; color: rgba(255,255,255,0.92); font-size: 0.78rem; line-height: 1.35;">
                 <span style="color: var(--color-accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; display: inline-block; margin-right: 6px;">🕒 Horario:</span>
                 <span><?php echo esc_html($horario_modal); ?></span>
             </div>
@@ -54,7 +54,7 @@
                 <div class="quote-grid">
                     <div>
                         <label style="display: block; margin-bottom: 0.35rem; color: var(--color-accent); font-family: var(--font-body); font-size: 0.84rem; font-weight: 600;">Categoría de Solicitud *</label>
-                        <select name="quote_category" id="quote_category" class="quote-select" required style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(212,175,55,0.08); border: 1.5px solid var(--color-accent); color: #fff; border-radius: 8px; font-size: 0.86rem; font-weight: 600; cursor: pointer;">
+                        <select name="quote_category" id="quote_category" class="quote-select" required style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(193,98,30,0.08); border: 1.5px solid var(--color-accent); color: #fff; border-radius: 8px; font-size: 0.86rem; font-weight: 600; cursor: pointer;">
                             <option value="cotizacion">Cotización de Espacios / Eventos</option>
                             <option value="generales">Temas generales / Información</option>
                             <option value="proveedores">Propuestas de proveedores</option>
@@ -91,11 +91,18 @@
                             <select name="quote_type" id="quote_type" class="quote-select" style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; font-size: 0.86rem;">
                                 <option value="" disabled selected>Seleccione el tipo de evento</option>
                                 <option value="Boda">Boda</option>
-                                <option value="Festejos corporativos">Festejos corporativos</option>
+                                <option value="XV años">XV años</option>
+                                <option value="Bautizo / Primera Comunión">Bautizo / Primera Comunión</option>
+                                <option value="Confirmación">Confirmación</option>
+                                <option value="Bar Mitzvá / Bat Mitzvá">Bar Mitzvá / Bat Mitzvá</option>
                                 <option value="Cumpleaños / Aniversario">Cumpleaños / Aniversario</option>
-                                <option value="Bautizos / Primera Comunión">Bautizos / Primera Comunión</option>
+                                <option value="Graduación">Graduación</option>
+                                <option value="Baby shower / Revelación de género">Baby shower / Revelación de género</option>
+                                <option value="Reunión familiar">Reunión familiar</option>
+                                <option value="Cena de gala">Cena de gala</option>
+                                <option value="Festejos corporativos">Festejos corporativos</option>
                                 <option value="Convención / Congreso">Convención / Congreso</option>
-                                <option value="Evento especial">Evento especial</option>
+                                <option value="Evento especial">Otro festejo / evento especial</option>
                             </select>
                         </div>
                     </div>
@@ -138,7 +145,7 @@
                     <em>* Al seleccionar una fecha verificaremos disponibilidad inmediata para tu evento.</em>
                 </div>
             
-            <button type="submit" id="quote-submit-btn" style="width: 100%; padding: 0.75rem 1.5rem; background: var(--color-accent); color: #000; border: none; cursor: pointer; border-radius: 9999px; font-weight: 700; font-size: 0.94rem; font-family: var(--font-body); transition: all 0.25s; margin-top: 0.3rem; box-shadow: 0 4px 15px rgba(212,175,55,0.3);" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 20px rgba(212,175,55,0.45)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 15px rgba(212,175,55,0.3)';">
+            <button type="submit" id="quote-submit-btn" style="width: 100%; padding: 0.75rem 1.5rem; background: var(--color-accent); color: #000; border: none; cursor: pointer; border-radius: 9999px; font-weight: 700; font-size: 0.94rem; font-family: var(--font-body); transition: all 0.25s; margin-top: 0.3rem; box-shadow: 0 4px 15px rgba(193,98,30,0.3);" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 20px rgba(193,98,30,0.45)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 15px rgba(193,98,30,0.3)';">
                 Enviar Solicitud
             </button>
             <div id="quote-form-msg" style="text-align: center; margin-top: 0.4rem; font-family: var(--font-body); display: none; font-size: 0.86rem;"></div>
@@ -211,31 +218,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const customRanges = selectedOpt ? selectedOpt.getAttribute('data-ranges') : '';
         if (customRanges && customRanges.trim() !== '') {
             ranges = customRanges.split(/[,;\n]/).map(r => r.trim()).filter(Boolean);
-        } else if (selectedVal.includes('jardín') || selectedVal.includes('jardin')) {
-            ranges = [
-                '1 a 300 personas',
-                'de 301 a 900 personas',
-                'de 901 a 1500 personas'
-            ];
-        } else if (selectedVal.includes('pavorreales')) {
-            ranges = [
-                '1 a 90 personas'
-            ];
-        } else if (selectedVal.includes('mezquite')) {
-            ranges = [
-                '1 a 150 personas'
-            ];
-        } else if (selectedVal.includes('principal')) {
-            ranges = [
-                '1 a 400 personas',
-                '401 a 800 personas'
-            ];
         } else {
-            ranges = [
-                '1 a 150 personas',
-                '151 a 400 personas',
-                'Más de 400 personas'
-            ];
+            ranges = ['A consultar'];
         }
 
         const defaultOpt = document.createElement('option');
@@ -265,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 if (quoteSalon) {
                     quoteSalon.style.borderColor = 'var(--color-accent)';
-                    quoteSalon.style.boxShadow = '0 0 12px rgba(212, 175, 55, 0.5)';
+                    quoteSalon.style.boxShadow = '0 0 12px rgba(193, 98, 30, 0.5)';
                     setTimeout(() => {
                         quoteSalon.style.borderColor = 'rgba(255,255,255,0.1)';
                         quoteSalon.style.boxShadow = 'none';
@@ -332,29 +316,48 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     if(overlay) {
+        const selectSalonByName = (salonAttr) => {
+            if (!quoteSalon || !salonAttr || !String(salonAttr).trim()) return false;
+            const targetNorm = normalizeStr(salonAttr);
+            if (!targetNorm) return false;
+            let exact = -1;
+            let partial = -1;
+            for (let i = 0; i < quoteSalon.options.length; i++) {
+                const raw = quoteSalon.options[i].value;
+                if (!raw) continue;
+                const optNorm = normalizeStr(raw);
+                if (!optNorm) continue;
+                if (optNorm === targetNorm) {
+                    exact = i;
+                    break;
+                }
+                if (partial < 0 && (optNorm.includes(targetNorm) || targetNorm.includes(optNorm))) {
+                    partial = i;
+                }
+            }
+            const idx = exact >= 0 ? exact : partial;
+            if (idx >= 0) {
+                quoteSalon.selectedIndex = idx;
+                quoteSalon.dispatchEvent(new Event('change', { bubbles: true }));
+                return true;
+            }
+            const newOpt = document.createElement('option');
+            newOpt.value = String(salonAttr).trim();
+            newOpt.textContent = String(salonAttr).trim();
+            quoteSalon.appendChild(newOpt);
+            quoteSalon.value = newOpt.value;
+            quoteSalon.dispatchEvent(new Event('change', { bubbles: true }));
+            return true;
+        };
+
         const openQuoteModalForSalon = (salonAttr) => {
-            if (quoteSalon && salonAttr && salonAttr.trim() !== '') {
+            const salon = (salonAttr || '').trim();
+            if (quoteSalon && salon) {
                 if (quoteCategory) {
                     quoteCategory.value = 'cotizacion';
                     updateCategoryFields();
                 }
-                const targetNorm = normalizeStr(salonAttr);
-                let matched = false;
-                for(let i = 0; i < quoteSalon.options.length; i++) {
-                    const optNorm = normalizeStr(quoteSalon.options[i].value);
-                    if (optNorm === targetNorm || optNorm.includes(targetNorm) || targetNorm.includes(optNorm)) {
-                        quoteSalon.selectedIndex = i;
-                        matched = true;
-                        break;
-                    }
-                }
-                if (!matched) {
-                    const newOpt = document.createElement('option');
-                    newOpt.value = salonAttr.trim();
-                    newOpt.textContent = salonAttr.trim();
-                    quoteSalon.appendChild(newOpt);
-                    quoteSalon.value = salonAttr.trim();
-                }
+                selectSalonByName(salon);
                 updateCapacityOptions();
             } else {
                 if (quoteCategory) {
@@ -382,7 +385,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (quoteBtn) {
                 e.preventDefault();
                 e.stopPropagation();
-                const salonAttr = quoteBtn.getAttribute('data-salon') || '';
+                const pageSalon = document.body.getAttribute('data-current-espacio') || '';
+                const salonAttr = quoteBtn.getAttribute('data-salon') || pageSalon || '';
                 openQuoteModalForSalon(salonAttr);
             }
         }, true);

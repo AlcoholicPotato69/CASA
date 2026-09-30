@@ -7,9 +7,9 @@ get_header();
 $horario_atencion = get_option('casa_opt_global_office_hours', 'Lunes a Viernes de 9:00 am a 6:00 pm | Sábados de 9:00 am a 2:00 pm');
 ?>
 
-<?php $portada_url = get_option('casa_opt_contacto_portada') ?: get_template_directory_uri() . '/assets/images/salon_principal_1779523069698.png'; ?>
+<?php $portada_url = function_exists('casa_opt_media') ? casa_opt_media('casa_opt_contacto_portada') : ''; ?>
 <section style="position: relative; z-index: 2; width: 100%; height: clamp(400px, 48vh, 550px); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #080808;">
-    <img src="<?php echo esc_url($portada_url); ?>" alt="Contacto Portada" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.68);" class="gs-zoom-in" />
+    <img src="<?php echo esc_url($portada_url); ?>" alt="Contacto Portada" fetchpriority="high" decoding="async" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.68);" class="gs-zoom-in" />
     <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,8,8,0.2) 0%, rgba(8,8,8,0.55) 75%, #080808 100%); z-index: 2; pointer-events: none;"></div>
     
     <div style="position: relative; z-index: 3; text-align: center; padding: 40px clamp(1rem, 4vw, 3rem) 0; max-width: 900px; margin: 0 auto;">
@@ -18,9 +18,9 @@ $horario_atencion = get_option('casa_opt_global_office_hours', 'Lunes a Viernes 
         
         <!-- Ornament -->
         <div style="display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin: 0.8rem 0;">
-            <span style="height: 1px; width: 50px; background: linear-gradient(to right, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+            <span style="height: 1px; width: 50px; background: linear-gradient(to right, transparent, rgba(193,98,30,0.7)); display: inline-block;"></span>
             <span style="color: var(--color-accent); font-size: 0.85rem;">✦</span>
-            <span style="height: 1px; width: 50px; background: linear-gradient(to left, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+            <span style="height: 1px; width: 50px; background: linear-gradient(to left, transparent, rgba(193,98,30,0.7)); display: inline-block;"></span>
         </div>
 
         <p style="color: #eaeaea; font-size: clamp(1.1rem, 2vw, 1.4rem); font-family: var(--font-heading); font-style: italic; margin: 0.5rem auto 0.8rem; line-height: 1.4; text-shadow: 0 4px 15px rgba(0,0,0,0.85);">
@@ -35,12 +35,12 @@ $horario_atencion = get_option('casa_opt_global_office_hours', 'Lunes a Viernes 
 
 <div style="min-height: 40vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 3rem 1.5rem;">
     
-    <div style="background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.28); border-radius: 12px; padding: 0.8rem 1.5rem; margin-bottom: 2rem; max-width: 550px; color: rgba(255,255,255,0.9); font-size: 0.95rem;">
+    <div style="background: rgba(193,98,30,0.08); border: 1px solid rgba(193,98,30,0.28); border-radius: 12px; padding: 0.8rem 1.5rem; margin-bottom: 2rem; max-width: 550px; color: rgba(255,255,255,0.9); font-size: 0.95rem;">
         <span style="color: var(--color-accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; display: block; margin-bottom: 4px;">Horario de Atención</span>
         <span><?php echo esc_html($horario_atencion); ?></span>
     </div>
 
-    <button type="button" id="open-quote-modal" class="btn-open-quote-modal" style="padding: 1.2rem 3rem; background: var(--color-accent); color: #000; border: none; border-radius: 9999px; font-weight: 600; font-size: 1.15rem; cursor: pointer; box-shadow: 0 10px 25px rgba(212,175,55,0.3);">
+    <button type="button" id="open-quote-modal" class="btn-open-quote-modal" style="padding: 1.2rem 3rem; background: var(--color-accent); color: #000; border: none; border-radius: 9999px; font-weight: 600; font-size: 1.15rem; cursor: pointer; box-shadow: 0 10px 25px rgba(193,98,30,0.3);">
         Abrir Formulario de Cotización
     </button>
 </div>

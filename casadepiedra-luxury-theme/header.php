@@ -1,17 +1,71 @@
 <!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
+<?php
+$casa_gtm = function_exists('casa_seo_gtm_id') ? casa_seo_gtm_id() : '';
+if ($casa_gtm === '') {
+    $casa_gtm = 'GTM-5N5VJXL4';
+}
+?>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+window.gtag = window.gtag || gtag;
+(function () {
+    var consent = {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        functionality_storage: 'granted',
+        personalization_storage: 'denied',
+        security_storage: 'granted',
+        wait_for_update: 500
+    };
+    try {
+        var raw = localStorage.getItem('casa_cookie_consent');
+        var prefs = raw ? JSON.parse(raw) : null;
+        if (!prefs) {
+            var legacy = localStorage.getItem('casa_privacy_consent');
+            if (legacy === 'accepted') prefs = { analytics: true, ads: true };
+            if (legacy === 'denied') prefs = { analytics: false, ads: false };
+        }
+        if (prefs && prefs.analytics) consent.analytics_storage = 'granted';
+        if (prefs && prefs.ads) {
+            consent.ad_storage = 'granted';
+            consent.ad_user_data = 'granted';
+            consent.ad_personalization = 'granted';
+            consent.personalization_storage = 'granted';
+        }
+    } catch (e) {}
+    gtag('consent', 'default', consent);
+})();
+</script>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','<?php echo esc_js($casa_gtm); ?>');</script>
+<!-- End Google Tag Manager -->
+    <script>
+    (function () {
+        try {
+            var fromNav = sessionStorage.getItem('casa_from_nav') === '1';
+            sessionStorage.removeItem('casa_from_nav');
+            document.documentElement.classList.add(fromNav ? 'casa-from-nav' : 'casa-first-visit');
+        } catch (e) {
+            document.documentElement.classList.add('casa-first-visit');
+        }
+    })();
+    </script>
     <meta charset="<?php bloginfo('charset'); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <?php wp_head(); ?>
     <script>
     (function() {
-        if (document.title) {
-            document.title = document.title.toUpperCase();
-        }
         window.addEventListener('DOMContentLoaded', () => {
-            const activeTitle = document.title.toUpperCase();
-            document.title = activeTitle;
+            const activeTitle = document.title;
             const hiddenMessages = [
                 '✨ TE EXTRAÑAMOS | CASA DE PIEDRA',
                 '👑 TU EVENTO TE ESPERA | CASA DE PIEDRA',
@@ -47,7 +101,7 @@
             background: rgba(8, 8, 8, 0.42);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            border-bottom: 1px solid rgba(193, 98, 30, 0.2);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
             display: flex;
             justify-content: space-between;
@@ -60,7 +114,7 @@
             background: rgba(6, 6, 6, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.45);
+            border-bottom: 1px solid rgba(193, 98, 30, 0.45);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.95);
         }
         .header-logo {
@@ -102,20 +156,74 @@
         .desktop-nav .current-menu-item > a {
             color: var(--color-accent) !important;
         }
+        .desktop-nav .nav-item-contacto,
+        .desktop-nav > ul > li:last-child {
+            isolation: isolate;
+        }
         .desktop-nav .nav-item-contacto > a,
         .desktop-nav > ul > li:last-child > a {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            contain: paint;
+            clip-path: inset(0 round 999px);
             padding: 0.5rem 1.3rem;
-            border: 1px solid rgba(212, 175, 55, 0.55);
+            border: 1px solid rgba(193, 98, 30, 0.55);
             border-radius: 999px;
             color: var(--color-accent) !important;
-            transition: all 0.3s ease;
+            transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .desktop-nav .nav-item-contacto > a::after,
+        .desktop-nav > ul > li:last-child > a::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 0;
+            background: linear-gradient(
+                115deg,
+                transparent 0%,
+                transparent 38%,
+                rgba(255, 236, 210, 0.42) 50%,
+                transparent 62%,
+                transparent 100%
+            );
+            background-size: 240% 100%;
+            background-repeat: no-repeat;
+            background-position: 160% 0;
+            opacity: 0;
+            animation: casa-contact-reflect 6.8s ease-in-out infinite;
         }
         .desktop-nav .nav-item-contacto > a:hover,
         .desktop-nav > ul > li:last-child > a:hover {
             background: var(--color-accent);
             color: #000 !important;
-            box-shadow: 0 0 18px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 0 18px rgba(193, 98, 30, 0.4);
             transform: translateY(-1px);
+        }
+        .desktop-nav .nav-item-contacto > a:hover::after,
+        .desktop-nav > ul > li:last-child > a:hover::after {
+            animation: casa-contact-reflect-fast 0.85s ease;
+        }
+        @keyframes casa-contact-reflect {
+            0%, 70% { background-position: 160% 0; opacity: 0; }
+            74% { opacity: 1; }
+            84% { background-position: -60% 0; opacity: 1; }
+            88%, 100% { background-position: -60% 0; opacity: 0; }
+        }
+        @keyframes casa-contact-reflect-fast {
+            0% { background-position: 160% 0; opacity: 1; }
+            100% { background-position: -60% 0; opacity: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .desktop-nav .nav-item-contacto > a::after,
+            .desktop-nav > ul > li:last-child > a::after,
+            .fullscreen-menu .nav-item-contacto > a::after,
+            .fullscreen-menu > ul > li:last-child > a::after {
+                animation: none !important;
+                opacity: 0 !important;
+            }
         }
 
         /* Dropdown Menu (Sub-menu) */
@@ -174,7 +282,7 @@
         }
         .desktop-nav .sub-menu a:hover,
         .desktop-nav .sub-menu li:last-child > a:hover {
-            background: rgba(212,175,55,0.1) !important;
+            background: rgba(193,98,30,0.1) !important;
             color: var(--color-accent) !important;
             padding-left: 2rem !important;
             box-shadow: none !important;
@@ -225,7 +333,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: radial-gradient(circle at center, rgba(212,175,55,0.05) 0%, transparent 70%);
+            background-image: radial-gradient(circle at center, rgba(193,98,30,0.05) 0%, transparent 70%);
             transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .fullscreen-menu.is-active {
@@ -261,14 +369,44 @@
         }
         .fullscreen-menu .nav-item-contacto > a,
         .fullscreen-menu > ul > li:last-child > a {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            contain: paint;
+            clip-path: inset(0 round 999px);
             color: var(--color-accent);
             display: inline-block;
             margin-top: 0.5rem;
             padding: 0.6rem 2.2rem;
-            border: 1px solid rgba(212,175,55,0.5);
+            border: 1px solid rgba(193,98,30,0.5);
             border-radius: 999px;
             font-size: clamp(1.4rem, 6vw, 2.5rem);
-            background: rgba(212,175,55,0.08);
+            background: rgba(193,98,30,0.08);
+        }
+        .fullscreen-menu .nav-item-contacto > a::after,
+        .fullscreen-menu > ul > li:last-child > a::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background: linear-gradient(
+                115deg,
+                transparent 0%,
+                transparent 38%,
+                rgba(255, 236, 210, 0.42) 50%,
+                transparent 62%,
+                transparent 100%
+            );
+            background-size: 240% 100%;
+            background-repeat: no-repeat;
+            background-position: 160% 0;
+            opacity: 0;
+            animation: casa-contact-reflect 6.8s ease-in-out infinite;
+        }
+        .fullscreen-menu .nav-item-contacto > a:hover::after,
+        .fullscreen-menu > ul > li:last-child > a:hover::after {
+            animation: casa-contact-reflect-fast 0.85s ease;
         }
         .fullscreen-menu a:hover,
         .fullscreen-menu .current-menu-item > a {
@@ -287,9 +425,15 @@
             left: 0;
             width: 100%;
             height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            box-sizing: border-box;
+            will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
             background-color: #0a0a0a;
             background-image: 
-                radial-gradient(circle at 10% 15%, rgba(212, 175, 55, 0.07) 0%, transparent 45%),
+                radial-gradient(circle at 10% 15%, rgba(193, 98, 30, 0.07) 0%, transparent 45%),
                 radial-gradient(circle at 90% 85%, rgba(180, 140, 80, 0.05) 0%, transparent 45%),
                 radial-gradient(circle at 50% 50%, rgba(20, 20, 20, 0.85) 0%, rgba(10, 10, 10, 1) 100%);
             z-index: 999999;
@@ -299,6 +443,33 @@
             align-items: center;
             justify-content: space-between;
             padding: clamp(2rem, 5vh, 4rem) 2rem;
+            transform: translate3d(0, 100%, 0);
+            visibility: hidden;
+        }
+        html.casa-first-visit #page-transition-overlay {
+            transform: translate3d(0, 100%, 0);
+            visibility: hidden;
+            animation: none;
+        }
+        html.casa-leaving #page-transition-overlay {
+            visibility: visible;
+            pointer-events: auto;
+            animation: casaOverlayIn 0.9s cubic-bezier(0.87, 0, 0.13, 1) forwards;
+        }
+        html.casa-from-nav #page-transition-overlay {
+            visibility: visible;
+            animation: casaOverlayOut 0.9s cubic-bezier(0.87, 0, 0.13, 1) forwards;
+        }
+        @keyframes casaOverlayIn {
+            from { transform: translate3d(0, 100%, 0); }
+            to { transform: translate3d(0, 0, 0); }
+        }
+        @keyframes casaOverlayOut {
+            from { transform: translate3d(0, 0, 0); }
+            to { transform: translate3d(0, -110%, 0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #page-transition-overlay { display: none !important; animation: none !important; }
         }
         .transition-divider-bar {
             width: clamp(200px, 60vw, 700px);
@@ -307,7 +478,7 @@
             justify-content: center;
             gap: 1.5rem;
             flex-shrink: 0;
-            color: #d4af37;
+            color: #c1621e;
             font-size: 0.85rem;
             opacity: 0.85;
         }
@@ -318,10 +489,10 @@
             height: 1px;
         }
         .transition-divider-bar::before {
-            background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.35) 100%);
+            background: linear-gradient(90deg, transparent 0%, rgba(193, 98, 30, 0.35) 100%);
         }
         .transition-divider-bar::after {
-            background: linear-gradient(90deg, rgba(212, 175, 55, 0.35) 0%, transparent 100%);
+            background: linear-gradient(90deg, rgba(193, 98, 30, 0.35) 0%, transparent 100%);
         }
         .transition-logo-container {
             display: flex;
@@ -343,26 +514,27 @@
             0%, 100% { transform: scale(0.95); opacity: 0.85; }
             50% { transform: scale(1.08); opacity: 1; }
         }
-        @view-transition {
-            navigation: auto;
-        }
     </style>
 </head>
-<body <?php body_class(); ?>>
+<body <?php body_class(); ?><?php
+    if (is_singular('espacios')) {
+        echo ' data-current-espacio="' . esc_attr(get_the_title()) . '"';
+    }
+?>>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=<?php echo esc_attr($casa_gtm); ?>"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<?php if (function_exists('wp_body_open')) { wp_body_open(); } ?>
     <div id="page-transition-overlay">
         <div class="transition-divider-bar"><span>◇</span></div>
         <div class="transition-logo-container">
             <?php 
-            $transition_logo = get_option('casa_opt_global_transition_logo');
-            if (!$transition_logo) {
-                $transition_logo = get_template_directory_uri() . '/assets/images/escudo-animacion-blanco.png';
-            }
-            
+            $transition_logo = function_exists('casa_transition_logo_url') ? casa_transition_logo_url() : '';
             if ($transition_logo) {
-                echo '<img src="' . esc_url($transition_logo) . '" alt="Cargando..." />';
+                echo '<img src="' . esc_url($transition_logo) . '" alt="" width="400" height="400" decoding="async" fetchpriority="low" />';
             } else {
-                // Fallback
-                echo '<img src="' . esc_url(get_template_directory_uri() . '/assets/images/escudo-animacion-blanco.png') . '" alt="Cargando..." />';
+                echo '<span class="casa-wordmark">Casa de Piedra</span>';
             }
             ?>
         </div>
@@ -371,23 +543,19 @@
     <nav class="header-wrapper">
         <div class="logo-container">
             <?php 
-            $panel_logo = get_option('casa_opt_global_logo');
+            $panel_logo = function_exists('casa_official_logo_url') ? casa_official_logo_url() : (function_exists('casa_logo_url') ? casa_logo_url() : '');
             if ($panel_logo) {
                 ?>
                 <a href="<?php echo esc_url(home_url('/')); ?>" style="text-decoration: none;">
-                    <img src="<?php echo esc_url($panel_logo); ?>" alt="<?php bloginfo('name'); ?>" class="header-logo" />
+                    <img src="<?php echo esc_url($panel_logo); ?>" alt="<?php bloginfo('name'); ?>" class="header-logo" width="450" height="80" decoding="async" />
                 </a>
                 <?php
             } elseif (has_custom_logo()) {
                 the_custom_logo();
             } else {
                 ?>
-                <a href="<?php echo esc_url(home_url('/')); ?>" style="text-decoration: none;">
-                    <img 
-                        src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/logo-navbar-oficial.png'); ?>" 
-                        alt="<?php bloginfo('name'); ?>" 
-                        class="header-logo"
-                    />
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="casa-wordmark-link" style="text-decoration: none;">
+                    <span class="casa-wordmark">Casa de Piedra</span>
                 </a>
                 <?php
             }

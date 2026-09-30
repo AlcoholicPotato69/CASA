@@ -5,11 +5,11 @@
  */
 get_header(); 
 
-$portada_url = get_option('casa_opt_eventos_portada') ?: get_template_directory_uri() . '/assets/images/salon_pavorreales_1779523097528.png';
+$portada_url = function_exists('casa_opt_media') ? casa_opt_media('casa_opt_eventos_portada') : '';
 ?>
 
 <section style="position: relative; z-index: 2; width: 100%; height: clamp(400px, 48vh, 550px); display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 2.5rem; background: #080808;">
-    <img src="<?php echo esc_url($portada_url); ?>" alt="Eventos Portada" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.68);" class="gs-zoom-in" />
+    <img src="<?php echo esc_url($portada_url); ?>" alt="Eventos Portada" fetchpriority="high" decoding="async" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.68);" class="gs-zoom-in" />
     <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,8,8,0.2) 0%, rgba(8,8,8,0.55) 75%, #080808 100%); z-index: 2; pointer-events: none;"></div>
     
     <div style="position: relative; z-index: 3; text-align: center; padding: 40px clamp(1rem, 4vw, 3rem) 0; max-width: 900px; margin: 0 auto;">
@@ -18,9 +18,9 @@ $portada_url = get_option('casa_opt_eventos_portada') ?: get_template_directory_
         
         <!-- Ornament -->
         <div style="display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin: 0.8rem 0;">
-            <span style="height: 1px; width: 50px; background: linear-gradient(to right, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+            <span style="height: 1px; width: 50px; background: linear-gradient(to right, transparent, rgba(193,98,30,0.7)); display: inline-block;"></span>
             <span style="color: var(--color-accent); font-size: 0.85rem;">✦</span>
-            <span style="height: 1px; width: 50px; background: linear-gradient(to left, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+            <span style="height: 1px; width: 50px; background: linear-gradient(to left, transparent, rgba(193,98,30,0.7)); display: inline-block;"></span>
         </div>
 
         <p style="color: #eaeaea; font-size: clamp(1.1rem, 2vw, 1.4rem); font-family: var(--font-heading); font-style: italic; margin: 0.5rem auto 0.8rem; line-height: 1.4; text-shadow: 0 4px 15px rgba(0,0,0,0.85);">
@@ -57,7 +57,7 @@ $portada_url = get_option('casa_opt_eventos_portada') ?: get_template_directory_
                             <a href="<?php the_permalink(); ?>" style="text-decoration: none; display: block;">
                                 <div style="height: 300px; overflow: hidden; position: relative;">
                                     <?php if (has_post_thumbnail()) : ?>
-                                        <img src="<?php the_post_thumbnail_url('large'); ?>" alt="<?php the_title_attribute(); ?>" class="img-cover hover:scale-105 transition-transform duration-700" style="transition: transform 0.7s;" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';" />
+                                        <img src="<?php the_post_thumbnail_url('large'); ?>" alt="<?php the_title_attribute(); ?>" class="img-cover hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async" style="transition: transform 0.7s;" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';" />
                                     <?php else : ?>
                                         <div class="img-cover" style="background-color: var(--color-surface);"></div>
                                     <?php endif; ?>

@@ -5,11 +5,11 @@
  */
 get_header(); 
 
-$portada_url = get_option('casa_opt_nosotros_portada') ?: get_template_directory_uri() . '/assets/images/salon_principal_1779523069698.png';
+$portada_url = function_exists('casa_opt_media') ? casa_opt_media('casa_opt_nosotros_portada') : '';
 ?>
 
 <section style="position: relative; z-index: 2; width: 100%; height: clamp(400px, 48vh, 550px); display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 2.5rem; background: #080808;">
-    <img src="<?php echo esc_url($portada_url); ?>" alt="Quiénes Somos Portada" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.68);" class="gs-zoom-in" />
+    <img src="<?php echo esc_url($portada_url); ?>" alt="Quiénes Somos Portada" fetchpriority="high" decoding="async" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.68);" class="gs-zoom-in" />
     <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,8,8,0.2) 0%, rgba(8,8,8,0.55) 75%, #080808 100%); z-index: 2; pointer-events: none;"></div>
     
     <div style="position: relative; z-index: 3; text-align: center; padding: 40px clamp(1rem, 4vw, 3rem) 0; max-width: 900px; margin: 0 auto;">
@@ -18,9 +18,9 @@ $portada_url = get_option('casa_opt_nosotros_portada') ?: get_template_directory
         
         <!-- Ornament -->
         <div style="display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin: 0.8rem 0;">
-            <span style="height: 1px; width: 50px; background: linear-gradient(to right, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+            <span style="height: 1px; width: 50px; background: linear-gradient(to right, transparent, rgba(193,98,30,0.7)); display: inline-block;"></span>
             <span style="color: var(--color-accent); font-size: 0.85rem;">✦</span>
-            <span style="height: 1px; width: 50px; background: linear-gradient(to left, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+            <span style="height: 1px; width: 50px; background: linear-gradient(to left, transparent, rgba(193,98,30,0.7)); display: inline-block;"></span>
         </div>
 
         <p style="color: #eaeaea; font-size: clamp(1.1rem, 2vw, 1.4rem); font-family: var(--font-heading); font-style: italic; margin: 0.5rem auto 0.8rem; line-height: 1.4; text-shadow: 0 4px 15px rgba(0,0,0,0.85);">
@@ -77,10 +77,10 @@ $portada_url = get_option('casa_opt_nosotros_portada') ?: get_template_directory
                 <!-- Imagen Destacada Interactiva -->
                 <div class="reveal-text luxury-card" style="padding: 0; border-radius: 20px; overflow: hidden; position: relative; min-height: 400px; display: flex;">
                     <?php 
-                    $hero_img = get_option('casa_opt_nosotros_hero_img') ?: get_template_directory_uri() . '/assets/images/terraza_mezquite_1779523084857.png';
+                    $hero_img = function_exists('casa_opt_media') ? casa_opt_media('casa_opt_nosotros_hero_img') : '';
                     ?>
                     <a href="<?php echo esc_url(home_url('/galeria/')); ?>" style="display: block; width: 100%; height: 100%; position: absolute; inset: 0;" title="Ver Galería">
-                        <img src="<?php echo esc_url($hero_img); ?>" alt="Casa de Piedra - Historia" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);" class="gs-zoom-in" onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='scale(1)';" />
+                        <img src="<?php echo esc_url($hero_img); ?>" alt="Casa de Piedra - Historia" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);" class="gs-zoom-in" onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='scale(1)';" />
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 40%); pointer-events: none;"></div>
                         <div style="position: absolute; bottom: 2rem; left: 2rem; pointer-events: none;">
                             <span style="color: #fff; font-family: var(--font-heading); font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; letter-spacing: 1px; text-transform: uppercase;">Ver Galería <span style="color: var(--color-accent); font-size: 1.5rem;">&rarr;</span></span>
@@ -114,8 +114,8 @@ $portada_url = get_option('casa_opt_nosotros_portada') ?: get_template_directory
                 </p>
             </div>
 
-            <div class="reveal-text" style="border-radius: 24px; overflow: hidden; border: 1px solid rgba(212,175,55,0.45); box-shadow: 0 25px 80px rgba(0,0,0,0.95); background: #000;">
-                <div style="padding: 1.2rem 2.5rem; background: linear-gradient(90deg, rgba(20,20,20,0.98) 0%, rgba(35,30,15,0.98) 50%, rgba(20,20,20,0.98) 100%); border-bottom: 1px solid rgba(212,175,55,0.3); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div class="reveal-text" style="border-radius: 24px; overflow: hidden; border: 1px solid rgba(193,98,30,0.45); box-shadow: 0 25px 80px rgba(0,0,0,0.95); background: #000;">
+                <div style="padding: 1.2rem 2.5rem; background: linear-gradient(90deg, rgba(20,20,20,0.98) 0%, rgba(35,30,15,0.98) 50%, rgba(20,20,20,0.98) 100%); border-bottom: 1px solid rgba(193,98,30,0.3); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div style="display: flex; align-items: center; gap: 0.8rem;">
                         <span style="display: inline-block; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e;"></span>
                         <span style="color: #fff; font-family: var(--font-heading); font-size: 1.25rem; letter-spacing: 0.5px;">CASA DE PIEDRA — TOUR INTERACTIVO 3D</span>

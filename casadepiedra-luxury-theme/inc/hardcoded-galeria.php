@@ -1,0 +1,24 @@
+<?php
+$hardcoded_galeria = array(
+  'IMG_4696-scaled.jpg',
+  'IMG_4694-scaled.jpg',
+  'imagen_2026-09-10_123442360.png',
+  'J3-1.jpg',
+  'T1.jpg',
+  '1-scaled.jpg',
+  '12.jpg',
+  '8.jpeg',
+  '5.jpeg',
+  'Gemini_Generated_Image_ekxa12ekxa12ekxa.png',
+  'SP2-scaled.jpeg',
+  'SP1-scaled.jpg',
+  'SP-3.jpg',
+  '61-scaled.jpg',
+  'P4.jpg',
+  'P3.jpg',
+  'P2.jpg',
+  'P1.jpg',
+  'J3.jpg',
+  'J2-scaled.jpeg',
+);
+?>

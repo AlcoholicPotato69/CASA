@@ -1,8 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 0. Initialize Lenis Smooth Scroll
-    if (typeof Lenis !== 'undefined') {
+    // 0. Initialize Lenis Smooth Scroll (desktop only — RAF extra on phones)
+    var preferReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var isCoarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    if (typeof Lenis !== 'undefined' && !preferReduced && !isCoarse && window.innerWidth >= 1024) {
         const lenis = new Lenis({
-            duration: 1.2,
+            duration: 1.05,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             direction: 'vertical',
             gestureDirection: 'vertical',
@@ -22,47 +24,52 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(raf);
     }
 
-    // 0.5. Page Transition with Anime.js
+    // 0.5. Page Transition (entrada + salida en CSS; el overlay no depende de Anime)
     const overlay = document.getElementById('page-transition-overlay');
-    if (overlay && typeof anime !== 'undefined') {
-        // Entrance animation (Reveal page)
-        anime({
-            targets: overlay,
-            translateY: ['0%', '-100%'],
-            easing: 'easeInOutExpo',
-            duration: 900,
-            complete: function() {
-                overlay.style.display = 'none';
-                overlay.style.pointerEvents = 'none';
-            }
+    if (overlay) {
+        overlay.addEventListener('animationend', function (e) {
+            if (e.target !== overlay) return;
+            if (e.animationName !== 'casaOverlayOut') return;
+            overlay.style.transform = 'translate3d(0, -110%, 0)';
+            overlay.style.visibility = 'hidden';
+            overlay.style.pointerEvents = 'none';
+            requestAnimationFrame(function () {
+                overlay.style.animation = 'none';
+            });
         });
 
-        // Exit animation (Hide page and redirect)
         document.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
                 
                 const hasGlightbox = this.classList.contains('glightbox') || this.closest('.glightbox') !== null;
-                const isImage = href.match(/\.(jpeg|jpg|gif|png|webp|svg|pdf)$/i) !== null;
+                const isImage = href && href.match(/\.(jpeg|jpg|gif|png|webp|svg|pdf)$/i) !== null;
                 
-                if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || this.getAttribute('target') === '_blank' || hasGlightbox || isImage) return;
+                if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('https://wa.') || href.startsWith('https://maps.') || this.getAttribute('target') === '_blank' || hasGlightbox || isImage) return;
                 
                 const isLocal = href.startsWith('/') || href.startsWith(window.location.origin);
                 
                 if (isLocal) {
                     e.preventDefault();
-                    overlay.style.display = 'flex';
-                    overlay.style.pointerEvents = 'auto'; // Block interaction while transitioning
-                    
-                    anime({
-                        targets: overlay,
-                        translateY: ['100%', '0%'],
-                        easing: 'easeInOutExpo',
-                        duration: 800,
-                        complete: function() {
-                            window.location.href = href;
-                        }
+                    if (document.documentElement.classList.contains('casa-leaving')) return;
+                    try { sessionStorage.setItem('casa_from_nav', '1'); } catch (err) {}
+                    overlay.removeAttribute('style');
+                    document.documentElement.classList.remove('casa-first-visit', 'casa-from-nav');
+                    overlay.offsetHeight;
+                    document.documentElement.classList.add('casa-leaving');
+
+                    var navigated = false;
+                    var go = function () {
+                        if (navigated) return;
+                        navigated = true;
+                        window.location.href = href;
+                    };
+                    overlay.addEventListener('animationend', function onIn(ev) {
+                        if (ev.target !== overlay || ev.animationName !== 'casaOverlayIn') return;
+                        overlay.removeEventListener('animationend', onIn);
+                        go();
                     });
+                    setTimeout(go, 1100);
                 }
             });
         });
@@ -82,10 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fix for bfcache (Safari/Chrome back button) causing permanent black screen
         window.addEventListener('pageshow', function(event) {
             if (event.persisted) {
-                overlay.style.display = 'none';
-                overlay.style.pointerEvents = 'none';
-                overlay.style.transform = 'translateY(-100%)';
-                if(typeof anime !== 'undefined') anime.set(overlay, { translateY: '-100%' });
+                document.documentElement.classList.remove('casa-leaving', 'casa-from-nav');
+                document.documentElement.classList.add('casa-first-visit');
+                overlay.removeAttribute('style');
             }
         });
     }
@@ -192,16 +198,20 @@ document.addEventListener('DOMContentLoaded', () => {
         gsap.registerPlugin(ScrollTrigger);
 
         const revealElements = document.querySelectorAll('.reveal-text');
-        
+        const vh = window.innerHeight || 800;
+
         revealElements.forEach((el) => {
+            if (el.getBoundingClientRect().top < vh * 0.92) {
+                return;
+            }
             gsap.from(el, {
                 scrollTrigger: {
                     trigger: el,
                     start: 'top 85%',
                 },
-                y: 50,
+                y: 36,
                 opacity: 0,
-                duration: 1,
+                duration: 0.7,
                 ease: 'power3.out'
             });
         });

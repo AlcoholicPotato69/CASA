@@ -8,7 +8,7 @@ $desc = get_option('casa_opt_home_hero_desc') ?: (get_post_meta(get_the_ID(), '_
 ?>
 <section style="position: relative; z-index: 2; min-height: 100vh; display: flex; align-items: center; padding-top: 10rem; overflow: hidden; background: #080808;">
     <div style="position: absolute; inset: 0; z-index: 1;">
-        <img id="hero-bg" src="<?php echo esc_url($bg); ?>" class="img-cover" />
+        <img id="hero-bg" src="<?php echo esc_url($bg); ?>" class="img-cover" fetchpriority="high" decoding="async" />
         <div style="position: absolute; inset: 0; background: rgba(8, 8, 8, 0.7);"></div>
     </div>
     <div class="container" style="position: relative; z-index: 10;">

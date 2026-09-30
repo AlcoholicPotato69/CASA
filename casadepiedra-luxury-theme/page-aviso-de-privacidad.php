@@ -56,7 +56,7 @@ get_header();
 
 .privacy-intro-box {
     background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    border: 1px solid rgba(193, 98, 30, 0.3);
     border-radius: 16px;
     padding: 2rem 2.5rem;
     margin-bottom: 3rem;
@@ -75,7 +75,7 @@ get_header();
 }
 
 .privacy-section:hover {
-    border-color: rgba(212, 175, 55, 0.25);
+    border-color: rgba(193, 98, 30, 0.25);
 }
 
 .privacy-section h2 {
@@ -132,7 +132,7 @@ get_header();
 }
 
 .privacy-contact-card {
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(15, 15, 15, 0.9) 100%);
+    background: linear-gradient(135deg, rgba(193, 98, 30, 0.08) 0%, rgba(15, 15, 15, 0.9) 100%);
     border: 1px solid var(--color-accent);
     border-radius: 16px;
     padding: 2.5rem;
@@ -183,25 +183,35 @@ get_header();
 }
 </style>
 
-<?php $portada_url = get_template_directory_uri() . '/assets/images/jardin_principal_1779523113451.png'; ?>
+<?php 
+$portada_url = function_exists('casa_opt_media') ? casa_opt_media('casa_opt_privacidad_portada') : '';
+$subtitle = get_option('casa_opt_privacidad_subtitle', 'Marco Legal & Confidencialidad');
+$title = get_option('casa_opt_privacidad_title', 'Aviso de Privacidad');
+$desc = get_option('casa_opt_privacidad_header_desc', 'Protección integral de datos personales conforme al marco normativo vigente');
+?>
 <section style="position: relative; z-index: 2; width: 100%; height: clamp(400px, 48vh, 550px); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #080808;">
-    <img src="<?php echo esc_url($portada_url); ?>" alt="Aviso de Privacidad Portada" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.68);" class="gs-zoom-in" />
+    <img src="<?php echo esc_url($portada_url); ?>" alt="<?php echo esc_attr($title); ?> Portada" fetchpriority="high" decoding="async" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.68);" class="gs-zoom-in" />
     <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,8,8,0.2) 0%, rgba(8,8,8,0.55) 75%, #080808 100%); z-index: 2; pointer-events: none;"></div>
     
     <div style="position: relative; z-index: 3; text-align: center; padding: 40px clamp(1rem, 4vw, 3rem) 0; max-width: 900px; margin: 0 auto;">
-        <span class="text-script" style="color: var(--color-accent); font-size: 1.4rem; display: block; margin-bottom: 0.2rem;">Marco Legal &amp; Confidencialidad</span>
-        <h1 style="color: #fff; font-size: clamp(2.3rem, 4.5vw, 3.6rem); margin: 0 0 0.6rem 0; font-family: var(--font-heading); line-height: 1.1; text-shadow: 0 10px 30px rgba(0,0,0,0.85);">Aviso de Privacidad</h1>
+        <?php if (!empty($subtitle)): ?>
+        <span class="text-script" style="color: var(--color-accent); font-size: 1.4rem; display: block; margin-bottom: 0.2rem;"><?php echo esc_html($subtitle); ?></span>
+        <?php endif; ?>
+        
+        <h1 style="color: #fff; font-size: clamp(2.3rem, 4.5vw, 3.6rem); margin: 0 0 0.6rem 0; font-family: var(--font-heading); line-height: 1.1; text-shadow: 0 10px 30px rgba(0,0,0,0.85);"><?php echo esc_html($title); ?></h1>
         
         <!-- Ornament -->
         <div style="display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin: 0.8rem 0;">
-            <span style="height: 1px; width: 50px; background: linear-gradient(to right, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+            <span style="height: 1px; width: 50px; background: linear-gradient(to right, transparent, rgba(193,98,30,0.7)); display: inline-block;"></span>
             <span style="color: var(--color-accent); font-size: 0.85rem;">✦</span>
-            <span style="height: 1px; width: 50px; background: linear-gradient(to left, transparent, rgba(212,175,55,0.7)); display: inline-block;"></span>
+            <span style="height: 1px; width: 50px; background: linear-gradient(to left, transparent, rgba(193,98,30,0.7)); display: inline-block;"></span>
         </div>
 
+        <?php if (!empty($desc)): ?>
         <p style="color: #eaeaea; font-size: clamp(1.1rem, 2vw, 1.4rem); font-family: var(--font-heading); font-style: italic; margin: 0.5rem auto 0.8rem; line-height: 1.4; text-shadow: 0 4px 15px rgba(0,0,0,0.85);">
-            &ldquo;Protección integral de datos personales conforme al marco normativo vigente&rdquo;
+            &ldquo;<?php echo esc_html($desc); ?>&rdquo;
         </p>
+        <?php endif; ?>
 
         <span style="color: var(--color-accent); font-size: 0.74rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.9); display: block; margin-top: 0.4rem;">
             Ex Hacienda Casa de Piedra &bull; Transparencia Oficial

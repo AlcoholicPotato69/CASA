@@ -1,0 +1,8 @@
+<?php
+$hardcoded_espacios = array(
+  array('title'=>'Jardín Principal', 'content'=>'Rodeado de vegetación y una atmósfera serena, el Jardín Principal es el escenario perfecto para celebraciones al aire libre con un trabajo selecto de paisajismo. Un espacio donde la naturaleza y la elegancia conviven para crear momentos memorables, desde ceremonias hasta recepciones bajo el cielo.', 'personas'=>'1 a 150 personas, 151 a 500 personas, 501 a 1000 personas, 1001 a 1500 personas', 'm2'=>'1,500', 'thumb'=>''),
+  array('title'=>'Salón Pavorreales', 'content'=>'Un espacio que combina privacidad, elegancia y calidez. Su diseño atemporal crea el ambiente ideal para eventos sociales, reuniones ejecutivas y celebraciones que buscan una experiencia más íntima, sin renunciar al sello distintivo de Casa de Piedra.', 'personas'=>'', 'm2'=>'', 'thumb'=>''),
+  array('title'=>'Terraza Mezquite', 'content'=>'Enmarcada por la arquitectura original de la ex hacienda y bajo la sombra de un majestuoso mezquite resguardado en un ojo de agua, que da nombre a este espacio, que invita a vivir celebraciones en un entorno donde la historia y la naturaleza conviven en perfecta armonía. Un escenario al aire libre, íntimo, elegante y lleno de encanto.', 'personas'=>'', 'm2'=>'', 'thumb'=>''),
+  array('title'=>'Salón Principal', 'content'=>'En el corazón de Casa de Piedra, se erige el salón con una arquitectura imponente, construcción de gran altura y detalles que reflejan el carácter histórico y emblemático del recinto. Su amplitud y versatilidad permiten recibir desde grandes celebraciones y eventos de alto nivel, ofreciendo el entorno más sofisticado para cualquier ocasión.', 'personas'=>'', 'm2'=>'', 'thumb'=>''),
+);
+?>

@@ -1,0 +1,306 @@
+{
+  "meta": {
+    "site": "casadepiedraleon.mx",
+    "entity": "Casa de Piedra León",
+    "entity_type": "EventVenue + Restaurant complex (ex hacienda 1845, Cerro Gordo, León, Gto.)",
+    "locale": "es-MX",
+    "market": "León de los Aldama, Guanajuato, México",
+    "generated": "2026-09-18",
+    "method": "SERP overlap (URL-level, top 10 organic) within intent groups",
+    "site_size_constraint": "Small venue site, ~10-18 URLs. Programmatic scaling explicitly rejected.",
+    "seed_keywords": [
+      "jardín de eventos León",
+      "salón de fiestas León",
+      "hacienda para bodas León",
+      "recinto eventos empresariales León",
+      "convenciones León",
+      "XV años León",
+      "restaurantes Casa de Piedra",
+      "salón Cerro Gordo"
+    ]
+  },
+
+  "critical_blockers": [
+    {
+      "id": "BLK-01",
+      "severity": "critical",
+      "title": "URL migration: live site is on legacy slugs, new theme is not",
+      "detail": "Live site serves /conoce-casa-de-piedra/ and /zona-de-restaurantes/. The new theme (inc/seo.php) canonicalises /espacios/ and /restaurantes/. /zona-de-restaurantes/ is currently the single strongest organic asset on the domain: it ranks position 1 for 'restaurantes Casa de Piedra' and for 'mejores restaurantes Cerro Gordo alta cocina'. /conoce-casa-de-piedra/ ranks position 1 for 'Casa de Piedra León eventos bodas' and 'salón de eventos Cerro Gordo León'.",
+      "action": "301 /conoce-casa-de-piedra/ -> /espacios/ and /zona-de-restaurantes/ -> /restaurantes/ at launch. Do not soft-404 or redirect both to homepage.",
+      "evidence": ["https://casadepiedraleon.mx/zona-de-restaurantes/", "https://casadepiedraleon.mx/conoce-casa-de-piedra/"]
+    },
+    {
+      "id": "BLK-02",
+      "severity": "high",
+      "title": "Restaurant roster conflict between theme data and every external source",
+      "detail": "Theme default_data / SKILL.md list: Argentilia, Lucio Ítalo-Argentino, Manolo, Sato, Valentina. Live site and all third-party sources list: Sato, Argentilia, Buenavista, La Cocinoteca, Corazón de Alcachofa, Agaves Casa de Piedra (live page text says 'siete restaurantes'). Lucio, Manolo and Valentina appear in zero external sources; Buenavista, La Cocinoteca, Corazón de Alcachofa and Agaves appear in zero theme sources.",
+      "action": "Confirm the current tenant roster with the client before publishing /restaurantes/ children. Publishing non-existent Restaurant schema nodes is an entity-trust and AEO risk.",
+      "evidence": ["https://casadepiedraleon.mx/zona-de-restaurantes/", "https://carta.menu/restaurants/casa-de-piedra/la-cocinoteca", "https://proleon.com.mx/estilo_de_vida/agaves-casa-de-piedra/", "https://leon-mexico.com/restaurantes/sato-restaurante/"]
+    },
+    {
+      "id": "BLK-03",
+      "severity": "high",
+      "title": "Capacity figures conflict between theme and all published sources",
+      "detail": "inc/seo.php FAQ and SKILL.md state Jardín Principal 1,500 and Salón Principal 800. Live site, VIVA LEÓN, lugaresparaeventos.mx and bodas.com.mx all state Jardín Principal 2,000 and Salón Principal 1,000, plus Terraza del Mezquite 200 and Salón Pavorreales 70 (empresarial) / 100 (auditorio).",
+      "action": "Pick one authoritative set and propagate to FAQPage schema, maximumAttendeeCapacity, /espacios/ children and the empresariales page. Capacity is the primary filter query for this vertical; inconsistency costs both rankings and AI answer inclusion.",
+      "evidence": ["https://leon-mexico.com/recinto/salones/casa-de-piedra-2/", "https://lugaresparaeventos.mx/lugar/guanajuato/leon/casa-de-piedra-leon"]
+    },
+    {
+      "id": "BLK-04",
+      "severity": "medium",
+      "title": "NAP citation drift in high-authority directories",
+      "detail": "bodas.com.mx lists 'Blvd. Juan Alonso de Torres 2002, Col. Valle del Campestre 37150' (Plaza Mayor address, not the venue). turismo.hotmarketing.net lists 'Av. Cerrada Cerro Gordo 270, El Campestre, 37150'. Canonical NAP is Av. Cerro Gordo 270, Casa de Piedra, 37120 León de los Aldama, Gto. Colonia also varies across sources (Casa de Piedra / Valle del Campestre / Club Campestre / Jardines del Campestre).",
+      "action": "Citation cleanup on bodas.com.mx, turismo.hotmarketing.net, unilocal.es. Lock one colonia string in schema, footer, GBP and llms.txt.",
+      "evidence": ["https://www.bodas.com.mx/haciendas-para-bodas/casa-de-piedra-leon--e358221", "https://turismo.hotmarketing.net/recinto/casa-de-piedra"]
+    }
+  ],
+
+  "serp_overlap_matrix": {
+    "notes": "Shared URL count in top 10 organic. Thresholds: 7-10 same page, 4-6 same cluster, 2-3 interlink only, 0-1 separate page.",
+    "pairs": [
+      { "a": "jardín de eventos León", "b": "salón de fiestas León", "shared_urls": 4, "shared_domains": ["bodas.com.mx", "salonesdefiestaleon.com"], "verdict": "same_cluster", "rationale": "Same directory profile page-type ranks for both; individual venue profiles (Salón Rocío) surface in both SERPs." },
+      { "a": "jardín de eventos León", "b": "hacienda para bodas León", "shared_urls": 3, "shared_domains": ["bodas.com.mx"], "verdict": "interlink", "rationale": "bodas.com.mx splits jardines-para-bodas vs haciendas-para-bodas into distinct category paths; Hacienda Real appears under jardines. Related but Google treats hacienda as a style qualifier." },
+      { "a": "salón de fiestas León", "b": "XV años León", "shared_urls": 4, "shared_domains": ["salonesdefiestaleon.com", "salonextravaganza.com"], "verdict": "same_cluster", "rationale": "Same directory dominance, but competitors serve XV via dedicated subpaths (claustrosantafe.com/eventos/xv-anos, terraza.poliforumleon.com/servicios/xv-anios)." },
+      { "a": "XV años León", "b": "graduaciones León", "shared_urls": 4, "shared_domains": ["salonextravaganza.com", "terraza.poliforumleon.com", "salonesdefiestaleon.com"], "verdict": "same_cluster", "rationale": "Near-identical competitor set; same venues, different subpath per occasion. Social-occasion queries are one SERP neighbourhood." },
+      { "a": "hacienda para bodas León", "b": "XV años León", "shared_urls": 2, "shared_domains": ["bodas.com.mx"], "verdict": "interlink", "rationale": "Bodas SERP skews to hacienda/venue-style pages; XV skews to package/price pages." },
+      { "a": "recinto eventos empresariales León", "b": "convenciones León", "shared_urls": 8, "shared_domains": ["poliforumleon.com.mx", "poliforumleon.mx", "realdeminaspoliforum.com.mx", "marriott.com"], "verdict": "same_page", "rationale": "Effectively one SERP: Poliforum León plus hotel meeting-space pages. Must be a single landing page, never two." },
+      { "a": "recinto eventos empresariales León", "b": "jardín de eventos León", "shared_urls": 0, "shared_domains": [], "verdict": "separate", "rationale": "Zero URL overlap. Corporate intent returns convention centres and hotels; social intent returns gardens and directories. Strongest separation signal in the dataset." },
+      { "a": "recinto eventos empresariales León", "b": "graduaciones León", "shared_urls": 1, "shared_domains": ["realdeminaspoliforum.com.mx"], "verdict": "separate", "rationale": "Only realdeminaspoliforum.com/salones bridges both. Confirms corporate is its own cluster." },
+      { "a": "salón Cerro Gordo", "b": "Casa de Piedra León eventos bodas", "shared_urls": 4, "shared_domains": ["casadepiedraleon.mx", "leon-mexico.com", "bodas.com.mx", "lugaresparaeventos.mx"], "verdict": "same_cluster", "rationale": "'salón Cerro Gordo' is already a brand-adjacent geo query that resolves to Casa de Piedra. Serve with existing hub + /espacios/. Do NOT build a geo landing page." },
+      { "a": "restaurantes Casa de Piedra", "b": "mejores restaurantes Cerro Gordo alta cocina", "shared_urls": 3, "shared_domains": ["casadepiedraleon.mx", "proleon.com.mx", "carta.menu"], "verdict": "same_cluster", "rationale": "casadepiedraleon.mx/zona-de-restaurantes/ ranks first for both. One archive plus per-restaurant children is the correct shape." },
+      { "a": "restaurantes Casa de Piedra", "b": "jardín de eventos León", "shared_urls": 0, "shared_domains": [], "verdict": "separate", "rationale": "Gastronomy and venue intents share no URLs. Two independent clusters under one hub." }
+    ]
+  },
+
+  "intent_classification": [
+    { "keyword": "jardín de eventos León", "intent": "commercial", "cluster": "venues", "target": "/espacios/" },
+    { "keyword": "salón de fiestas León", "intent": "commercial", "cluster": "venues", "target": "/espacios/" },
+    { "keyword": "salón de eventos León", "intent": "commercial", "cluster": "venues", "target": "/espacios/" },
+    { "keyword": "jardín para eventos zona norte León", "intent": "commercial", "cluster": "venues", "target": "/espacios/jardin-principal/" },
+    { "keyword": "salón para 1000 personas León", "intent": "commercial", "cluster": "venues", "target": "/espacios/salon-principal/" },
+    { "keyword": "terraza para eventos León", "intent": "commercial", "cluster": "venues", "target": "/espacios/terraza-mezquite/" },
+    { "keyword": "salón privado para reuniones León", "intent": "commercial", "cluster": "venues", "target": "/espacios/salon-pavorreales/" },
+    { "keyword": "hacienda para bodas León", "intent": "commercial", "cluster": "bodas", "target": "/bodas/" },
+    { "keyword": "ex hacienda para bodas León Guanajuato", "intent": "commercial", "cluster": "bodas", "target": "/bodas/" },
+    { "keyword": "jardín para bodas León", "intent": "commercial", "cluster": "bodas", "target": "/bodas/" },
+    { "keyword": "lugares para boda León capacidad 500", "intent": "commercial", "cluster": "bodas", "target": "/bodas/" },
+    { "keyword": "recinto eventos empresariales León", "intent": "commercial", "cluster": "empresariales", "target": "/eventos-empresariales/" },
+    { "keyword": "convenciones León", "intent": "commercial", "cluster": "empresariales", "target": "/eventos-empresariales/" },
+    { "keyword": "salón para congresos León", "intent": "commercial", "cluster": "empresariales", "target": "/eventos-empresariales/" },
+    { "keyword": "sala de juntas León auditorio 100 personas", "intent": "commercial", "cluster": "empresariales", "target": "/eventos-empresariales/" },
+    { "keyword": "cena de fin de año empresa León", "intent": "commercial", "cluster": "empresariales", "target": "/eventos-empresariales/" },
+    { "keyword": "XV años León", "intent": "commercial", "cluster": "social_occasions", "target": "/espacios/ (section) — page deferred to phase 2" },
+    { "keyword": "graduaciones León", "intent": "commercial", "cluster": "social_occasions", "target": "/espacios/ (section)" },
+    { "keyword": "bautizos León salón", "intent": "commercial", "cluster": "social_occasions", "target": "/espacios/terraza-mezquite/ (section)" },
+    { "keyword": "restaurantes Casa de Piedra", "intent": "navigational_commercial", "cluster": "gastronomia", "target": "/restaurantes/" },
+    { "keyword": "alta cocina León Cerro Gordo", "intent": "commercial", "cluster": "gastronomia", "target": "/restaurantes/" },
+    { "keyword": "restaurante japonés nikkei León", "intent": "commercial", "cluster": "gastronomia", "target": "/restaurantes/sato/" },
+    { "keyword": "salón Cerro Gordo", "intent": "navigational", "cluster": "brand", "target": "/ (hub)", "clustering": "excluded_navigational" },
+    { "keyword": "Casa de Piedra León", "intent": "navigational", "cluster": "brand", "target": "/ (hub)", "clustering": "excluded_navigational" }
+  ],
+
+  "architecture": {
+    "model": "single hub, two primary category spokes, two service spokes, entity children",
+    "hub": {
+      "url": "/",
+      "role": "Entity hub. Carries Organization + LocalBusiness + EventVenue + EntertainmentBusiness, sitelinks SearchAction, and the complex-level narrative (ex hacienda 1845, venues + gastronomía + estacionamiento).",
+      "primary_keyword": "Casa de Piedra León / jardín de eventos León",
+      "word_count_target": "1200-1800 (hub pages on a 10-URL site should not chase 3000)",
+      "status": "exists"
+    },
+    "clusters": [
+      {
+        "id": "venues",
+        "name": "Espacios y venues",
+        "pillar": { "url": "/espacios/", "primary_keyword": "salón de eventos en León / jardín de eventos León", "template": "category_listing", "word_count_target": "900-1400", "status": "exists" },
+        "spokes": [
+          { "url": "/espacios/jardin-principal/", "primary_keyword": "jardín de eventos León", "template": "venue_profile", "word_count_target": "600-900", "status": "exists", "schema": "Place + EventVenue" },
+          { "url": "/espacios/salon-principal/", "primary_keyword": "salón de fiestas León (gran capacidad)", "template": "venue_profile", "word_count_target": "600-900", "status": "exists", "schema": "Place + EventVenue" },
+          { "url": "/espacios/terraza-mezquite/", "primary_keyword": "terraza para eventos León", "template": "venue_profile", "word_count_target": "600-900", "status": "exists", "schema": "Place + EventVenue" },
+          { "url": "/espacios/salon-pavorreales/", "primary_keyword": "salón privado para reuniones León", "template": "venue_profile", "word_count_target": "600-900", "status": "exists", "schema": "Place + EventVenue" }
+        ],
+        "serp_support": "Directory venue-profile pages (lugaresparaeventos.mx, salonesdefiestaleon.com, bodas.com.mx) are the ranking page-type for these queries. One profile per physical space mirrors that shape without duplicating it."
+      },
+      {
+        "id": "gastronomia",
+        "name": "Restaurantes",
+        "pillar": { "url": "/restaurantes/", "primary_keyword": "restaurantes Casa de Piedra / alta cocina León", "template": "category_listing", "word_count_target": "700-1100", "status": "exists", "migration": "301 from /zona-de-restaurantes/" },
+        "spokes": [
+          { "url": "/restaurantes/{slug}/", "primary_keyword": "one cuisine + city per restaurant (e.g. 'restaurante nikkei León' for Sato)", "template": "restaurant_profile", "word_count_target": "500-800", "status": "exists_pending_roster_confirmation", "schema": "Restaurant with servesCuisine, priceRange, openingHoursSpecification", "count": "5-7, one per confirmed tenant", "blocked_by": "BLK-02" }
+        ],
+        "serp_support": "Zero URL overlap with the venue cluster. Independent cluster, but must stay under the same hub because the complex is the differentiator (venue + restaurants on one site)."
+      },
+      {
+        "id": "bodas",
+        "name": "Bodas",
+        "pillar": { "url": "/bodas/", "primary_keyword": "hacienda para bodas León Guanajuato", "template": "service_landing", "word_count_target": "1200-1800", "status": "create", "priority": 1 },
+        "spokes": [],
+        "thin_content_verdict": "NOT thin, conditional on content gate below",
+        "justification": "bodas.com.mx maintains a distinct /haciendas-para-bodas/ category path separate from /jardines-para-bodas/ and /salones-para-bodas/, and Casa de Piedra already ranks in it. The 'hacienda' qualifier is a genuine style-intent modifier, not a synonym. The page has unique substance available to it that /espacios/ cannot carry: the 1845 founding, the ceremony-to-reception flow across Jardín Principal into Salón Principal, wedding-specific capacity tiers, banquet integration with the on-site restaurants, and valet parking.",
+        "content_gate": [
+          "Minimum 1,200 words of wedding-specific copy. Zero sentences copy-pasted from /espacios/.",
+          "At least 8 real wedding photographs from the venue, not stock and not reused from the galería grid verbatim.",
+          "A ceremony + reception flow narrative naming the specific spaces and the transition between them.",
+          "Capacity and pricing-range guidance grounded in real numbers (BLK-03 must be resolved first).",
+          "FAQPage with at least 5 questions answerable only by this venue (music curfew, descorche, capilla/ceremonia civil, proveedor externo policy, parking count).",
+          "If any two gate items cannot be met, do not ship the page. Add a bodas section to /espacios/ instead."
+        ],
+        "schema": "WebPage + Service (serviceType: Wedding venue) + FAQPage, provider -> Organization @id"
+      },
+      {
+        "id": "empresariales",
+        "name": "Eventos empresariales y convenciones",
+        "pillar": { "url": "/eventos-empresariales/", "primary_keyword": "recinto para eventos empresariales León", "secondary_keywords": ["convenciones León", "salón para congresos León", "sala de juntas León"], "template": "service_landing", "word_count_target": "1200-1800", "status": "create", "priority": 2 },
+        "spokes": [],
+        "thin_content_verdict": "NOT thin. Highest-confidence recommendation in this plan.",
+        "justification": "The corporate SERP has ZERO shared URLs with every social-event SERP tested. It is owned by Poliforum León and hotel meeting-space pages (Real de Minas, Courtyard by Marriott, HS Hotsson), all of which publish capacity tables by montaje. Casa de Piedra currently has no page competing in that SERP at all, and the homepage cannot rank there because it signals social-events intent. Corporate buyers also search on entirely different attributes (montaje auditorio/escuela/herradura, m², AV, wifi, parking count) which do not belong on a social-events page.",
+        "content_gate": [
+          "Capacity table by montaje (auditorio, escuela, herradura, banquete, cóctel) for Salón Principal and Salón Pavorreales, mirroring how every ranking competitor presents the data. This is the single highest-leverage element.",
+          "m² per space, AV/connectivity inventory, valet and parking capacity.",
+          "Business-lunch and coffee-break angle linking to /restaurantes/ — a differentiator no hotel or convention centre in this SERP has in the same form.",
+          "Distance/access framing: zona norte, cerca de Plaza Mayor, vs the Poliforum corridor.",
+          "FAQPage with 5+ corporate-specific questions (facturación, horarios de montaje, señal de internet dedicada, proveedores AV externos)."
+        ],
+        "schema": "WebPage + Service (serviceType: Corporate event venue) + FAQPage. Consider EventVenue with maximumAttendeeCapacity per montaje."
+      }
+    ]
+  },
+
+  "rejected_pages": [
+    {
+      "url": "/xv-anos/",
+      "verdict": "defer to phase 2, gated",
+      "rationale": "SERP overlap with 'salón de fiestas León' is 4 and with 'graduaciones León' is 4 — the same neighbourhood /espacios/ already targets. Competitors do run dedicated XV subpaths, so the page-type is viable, but on a ~10-URL site a third occasion page drawing from the same four physical spaces starts to read as templated. Serve XV años as a section on /espacios/ plus a galería category first. Revisit only if GSC shows XV impressions with no adequate landing page after 90 days, and only with genuinely XV-specific content (vals space, chambelanes staging, package tiers)."
+    },
+    { "url": "/graduaciones/", "verdict": "reject", "rationale": "Same SERP neighbourhood as XV años. Serve as a section plus galería category." },
+    { "url": "/bautizos/, /cumpleanos/, /baby-shower/, /bar-mitzva/", "verdict": "reject", "rationale": "Classic doorway pattern. These are low-differentiation occasions that would all describe Terraza Mezquite and Salón Pavorreales. Cover them as an occasion list on /espacios/ and in the venue-profile 'ideal para' blocks." },
+    { "url": "/salon-cerro-gordo/ or any geo landing page", "verdict": "reject", "rationale": "'salón Cerro Gordo León' already resolves to Casa de Piedra's own pages plus its directory profiles (4 shared URLs with the brand query). The hub and /espacios/ already win it. A geo page would cannibalise the hub." },
+    { "url": "/jardin-de-eventos-leon/, /salon-de-fiestas-leon/", "verdict": "reject", "rationale": "Keyword-variant duplicates of /espacios/ and /espacios/jardin-principal/. Guaranteed cannibalisation." },
+    { "url": "/eventos/ (CPT archive)", "verdict": "keep disabled", "rationale": "casa_opt_status_eventos is 0 and inc/seo.php correctly noindexes it. An empty or near-empty archive is index bloat. Enable only when there is a real, recurring calendar of published events. Note that /bodas/ and /eventos-empresariales/ are deliberately flat pages so they carry no dependency on this CPT." },
+    { "url": "Programmatic location/occasion matrix (occasion × space × capacity)", "verdict": "reject", "rationale": "Explicitly out of scope. A single-location venue has one address and four spaces. There is no data dimension to scale on, and the thin-content and index-bloat risk is total." }
+  ],
+
+  "url_tree": {
+    "sitelinks_priority_order": [
+      { "rank": 1, "url": "/", "label": "Inicio", "status": "exists" },
+      { "rank": 2, "url": "/espacios/", "label": "Espacios y salones", "status": "exists" },
+      { "rank": 3, "url": "/restaurantes/", "label": "Restaurantes", "status": "exists", "migration": "301 from /zona-de-restaurantes/" },
+      { "rank": 4, "url": "/bodas/", "label": "Bodas", "status": "create" },
+      { "rank": 5, "url": "/eventos-empresariales/", "label": "Eventos empresariales", "status": "create" },
+      { "rank": 6, "url": "/galeria/", "label": "Galería", "status": "exists" },
+      { "rank": 7, "url": "/quienes-somos/", "label": "Historia", "status": "exists" },
+      { "rank": 8, "url": "/contacto/", "label": "Contacto", "status": "exists" }
+    ],
+    "full_tree": {
+      "/": {
+        "status": "exists",
+        "children": {
+          "/espacios/": {
+            "status": "exists",
+            "children": {
+              "/espacios/jardin-principal/": "exists",
+              "/espacios/salon-principal/": "exists",
+              "/espacios/terraza-mezquite/": "exists",
+              "/espacios/salon-pavorreales/": "exists"
+            }
+          },
+          "/restaurantes/": {
+            "status": "exists",
+            "migration": "301 from /zona-de-restaurantes/",
+            "children": { "/restaurantes/{slug}/": "exists, 5-7 items, roster blocked by BLK-02" }
+          },
+          "/bodas/": { "status": "create", "priority": 1 },
+          "/eventos-empresariales/": { "status": "create", "priority": 2 },
+          "/galeria/": { "status": "exists", "recommendation": "add filterable categories: bodas, XV años, empresariales, sociales — this is how XV and graduaciones get served without doorway pages" },
+          "/quienes-somos/": { "status": "exists", "recommendation": "this is the E-E-A-T and entity page: 1845 founding, hacienda history, awards, press. Strongest asset for GEO/AI citation." },
+          "/contacto/": "exists",
+          "/aviso-de-privacidad/": "exists, noindex acceptable",
+          "/eventos/": "exists but disabled, keep noindexed"
+        }
+      }
+    },
+    "total_indexable_urls": "16-18 after the two new pages. Correct scale for this entity."
+  },
+
+  "internal_link_matrix": {
+    "notes": "MANDATORY = must ship, bidirectional. RECOMMENDED = contextual in-body. Every node below has >= 3 incoming links; no orphans.",
+    "mandatory": [
+      { "from": "/", "to": ["/espacios/", "/restaurantes/", "/bodas/", "/eventos-empresariales/", "/galeria/", "/quienes-somos/", "/contacto/"], "placement": "primary nav + hero section cards" },
+      { "from": "/espacios/", "to": ["/", "/espacios/jardin-principal/", "/espacios/salon-principal/", "/espacios/terraza-mezquite/", "/espacios/salon-pavorreales/"], "placement": "breadcrumb + archive cards. All four children must appear; do not paginate." },
+      { "from": "/espacios/{child}/", "to": ["/espacios/", "/"], "placement": "breadcrumb" },
+      { "from": "/restaurantes/", "to": ["/", "/restaurantes/{all children}"], "placement": "breadcrumb + archive cards" },
+      { "from": "/restaurantes/{child}/", "to": ["/restaurantes/", "/"], "placement": "breadcrumb" },
+      { "from": "/bodas/", "to": ["/", "/espacios/jardin-principal/", "/espacios/salon-principal/", "/espacios/terraza-mezquite/", "/galeria/", "/restaurantes/"], "placement": "in-body space cards + banquete section + galería CTA" },
+      { "from": "/eventos-empresariales/", "to": ["/", "/espacios/salon-principal/", "/espacios/salon-pavorreales/", "/restaurantes/", "/galeria/"], "placement": "in-body capacity table rows link to the space profiles" },
+      { "from": "/galeria/", "to": ["/", "/espacios/", "/bodas/", "/eventos-empresariales/"], "placement": "category filter chips" },
+      { "from": "all pages", "to": ["/#quote-modal"], "placement": "persistent CTA — conversion path, keep nofollow-free and crawlable as a fragment of /" }
+    ],
+    "recommended": [
+      { "from": "/espacios/jardin-principal/", "to": ["/bodas/", "/espacios/salon-principal/", "/espacios/terraza-mezquite/"], "anchor_guidance": "descriptive anchors: 'bodas en la ex hacienda', 'Salón Principal para 1,000 personas'. Never 'click aquí'." },
+      { "from": "/espacios/salon-principal/", "to": ["/bodas/", "/eventos-empresariales/", "/espacios/jardin-principal/"], "anchor_guidance": "this space serves both clusters — it is the bridge node" },
+      { "from": "/espacios/terraza-mezquite/", "to": ["/bodas/", "/espacios/salon-pavorreales/", "/restaurantes/"] },
+      { "from": "/espacios/salon-pavorreales/", "to": ["/eventos-empresariales/", "/espacios/terraza-mezquite/"] },
+      { "from": "/restaurantes/{child}/", "to": ["2-3 sibling restaurants", "/espacios/"], "anchor_guidance": "'otros restaurantes del complejo' + 'eventos privados en nuestros salones'" },
+      { "from": "/quienes-somos/", "to": ["/espacios/", "/bodas/"], "anchor_guidance": "history page feeds the hacienda-para-bodas angle — this is the E-E-A-T bridge" },
+      { "from": "/bodas/", "to": ["/eventos-empresariales/"], "anchor_guidance": "low priority cross-cluster; only in a 'otros tipos de evento' footer block" }
+    ],
+    "incoming_link_audit": {
+      "/espacios/": 8,
+      "/espacios/jardin-principal/": 5,
+      "/espacios/salon-principal/": 6,
+      "/espacios/terraza-mezquite/": 5,
+      "/espacios/salon-pavorreales/": 4,
+      "/restaurantes/": 7,
+      "/restaurantes/{child}/": 4,
+      "/bodas/": 7,
+      "/eventos-empresariales/": 6,
+      "/galeria/": 5,
+      "/quienes-somos/": 3,
+      "orphans": []
+    }
+  },
+
+  "cannibalization_check": {
+    "result": "pass",
+    "checks": [
+      { "pair": "/ vs /espacios/", "risk": "medium", "status": "mitigated", "action": "Hub title must lead with the brand-and-complex framing ('Casa de Piedra León | Jardín, salones y restaurantes'). /espacios/ owns the generic 'salón de eventos en León' head term. inc/seo.php currently sets the homepage title to 'Jardín de eventos en León | Casa de Piedra' and /espacios/ to 'Salones de eventos en León | Casa de Piedra' — these are close enough to compete. Differentiate: give the jardín head term to /espacios/jardin-principal/ or to /espacios/, not to both the hub and a child." },
+      { "pair": "/espacios/ vs /espacios/jardin-principal/", "risk": "medium", "status": "action_required", "action": "Both currently target 'jardín de eventos León'. Assign the head term to /espacios/ (category intent, matches the directory-listing page-type that ranks) and give the child the long-tail 'jardín para eventos al aire libre zona norte León' plus capacity modifiers." },
+      { "pair": "/bodas/ vs /espacios/", "risk": "medium", "status": "mitigated_by_design", "action": "/espacios/ targets space-and-capacity intent ('salón de eventos León'). /bodas/ targets style-and-occasion intent ('hacienda para bodas León'). Enforce zero copy overlap and distinct H1s." },
+      { "pair": "/eventos-empresariales/ vs /espacios/salon-pavorreales/", "risk": "low", "status": "pass", "action": "Service page targets the city-level corporate term; the space profile targets 'salón privado para reuniones León'. Different SERPs." },
+      { "pair": "/restaurantes/ vs /restaurantes/{child}/", "risk": "low", "status": "pass", "action": "Archive owns 'restaurantes Casa de Piedra' and 'alta cocina León'; each child owns one cuisine term." },
+      { "pair": "/eventos/ CPT vs /bodas/ + /eventos-empresariales/", "risk": "none", "status": "pass", "action": "CPT stays disabled and noindexed; new pages are flat." }
+    ],
+    "no_duplicate_primary_keywords": true
+  },
+
+  "implementation_order": [
+    { "step": 1, "task": "Resolve BLK-01: 301 map for /conoce-casa-de-piedra/ and /zona-de-restaurantes/ before launch", "blocking": true },
+    { "step": 2, "task": "Resolve BLK-02 and BLK-03: confirm restaurant roster and capacity figures with the client", "blocking": true },
+    { "step": 3, "task": "Fix the /espacios/ vs jardin-principal and hub vs /espacios/ title/keyword assignments in inc/seo.php", "blocking": false },
+    { "step": 4, "task": "Ship /eventos-empresariales/ with the montaje capacity table. Highest-confidence opportunity: uncontested by the site today, zero SERP overlap with existing pages.", "blocking": false },
+    { "step": 5, "task": "Ship /bodas/ only if all content-gate items are met", "blocking": false },
+    { "step": 6, "task": "Add galería categories (bodas, XV años, empresariales, sociales) and occasion sections to /espacios/", "blocking": false },
+    { "step": 7, "task": "Add both new URLs to the sitemap page list in inc/seo.php, to llms.txt, and to the sitelinks tree in .cursor/skills/casa-de-piedra-seo/SKILL.md", "blocking": false },
+    { "step": 8, "task": "Citation cleanup per BLK-04", "blocking": false },
+    { "step": 9, "task": "After 90 days, review GSC for XV años impressions before reconsidering /xv-anos/", "blocking": false }
+  ],
+
+  "competitive_context": {
+    "social_events_serp": {
+      "character": "Directory-dominated. Own-site venue pages rank below aggregators.",
+      "players": ["bodas.com.mx", "lugaresparaeventos.mx", "salonesdefiestaleon.com", "salonify.mx", "leon-mexico.com"],
+      "implication": "Own-site pages win on entity depth and freshness, not on breadth. Also treat the directory profiles as a distribution channel — Casa de Piedra already has profiles on bodas.com.mx, lugaresparaeventos.mx, leon-mexico.com and turismo.hotmarketing.net. Keeping those accurate is as valuable as the on-site work, and BLK-04 shows they are currently wrong.",
+      "direct_venue_competitors": ["Claustro Santa Fe", "Ex Hacienda Cruz de Cantera", "Hacienda Los Rincones", "Hacienda del Conde", "Hacienda Real", "Salón Extravaganza", "Terraza Poliforum"]
+    },
+    "corporate_serp": {
+      "character": "Own-site pages dominate. No directory layer.",
+      "players": ["poliforumleon.com.mx", "realdeminaspoliforum.com.mx", "marriott.com", "HS Hotsson", "Hotel San Francisco León", "Claustro Santa Fe"],
+      "implication": "Winnable with one well-built page. Every ranking competitor publishes a montaje capacity table — that is the table-stakes content element, and Casa de Piedra's 1,000-person Salón Principal plus 100-person auditorio Pavorreales are competitive against the hotel tier."
+    },
+    "gastronomy_serp": {
+      "character": "Own-site page already ranks position 1, supported by review and menu aggregators.",
+      "players": ["carta.menu", "proleon.com.mx", "experienciasmx.travel", "leon-mexico.com"],
+      "implication": "Defend, do not rebuild. The migration in BLK-01 is the only real risk to this cluster."
+    }
+  }
+}

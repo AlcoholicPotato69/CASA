@@ -13,7 +13,15 @@ get_header(); ?>
             if ($q->have_posts()) : while ($q->have_posts()) : $q->the_post(); ?>
                 <a href="<?php the_permalink(); ?>" class="luxury-card reveal-text">
                     <div style="height: 270px; overflow: hidden;">
-                        <?php if(has_post_thumbnail()) { ?><img src="<?php the_post_thumbnail_url('large'); ?>" class="img-cover" /><?php } ?>
+                        <?php
+                        $tarjeta_inicio = function_exists('casadepiedra_resolve_espacio_card_img')
+                            ? casadepiedra_resolve_espacio_card_img(get_the_ID())
+                            : get_post_meta(get_the_ID(), '_espacio_tarjeta_inicio', true);
+                        if (!empty($tarjeta_inicio)) { ?>
+                            <img src="<?php echo esc_url($tarjeta_inicio); ?>" class="img-cover" loading="lazy" decoding="async" />
+                        <?php } elseif(has_post_thumbnail()) { ?>
+                            <img src="<?php the_post_thumbnail_url('large'); ?>" class="img-cover" loading="lazy" decoding="async" />
+                        <?php } ?>
                     </div>
                     <div style="padding: 2rem;">
                         <h3 class="text-h3" style="color: #fff; margin-bottom:0.5rem;"><?php the_title(); ?></h3>

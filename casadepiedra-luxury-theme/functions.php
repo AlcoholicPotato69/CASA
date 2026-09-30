@@ -28,17 +28,227 @@ function casadepiedra_setup() {
 }
 add_action('after_setup_theme', 'casadepiedra_setup');
 
+require_once get_template_directory() . '/inc/media.php';
+
+/**
+ * Reemplazo seguro de get_page_by_title() (deprecado en WP 6.2+).
+ * Evita avisos que rompen el login / redirecciones del admin.
+ */
+function casadepiedra_get_post_by_title($title, $post_type = 'page') {
+    $found = get_posts(array(
+        'post_type'        => $post_type,
+        'title'            => $title,
+        'post_status'      => 'any',
+        'posts_per_page'   => 1,
+        'suppress_filters' => true,
+    ));
+    return !empty($found) ? $found[0] : null;
+}
+
+function casa_repair_mojibake($text, $fallback = '') {
+    $text = is_string($text) ? $text : '';
+    if ($text === '') {
+        return $fallback;
+    }
+    if (strpos($text, "\xEF\xBF\xBD") !== false || preg_match('/Ã.|Â[\x80-\xBF]/', $text)) {
+        return $fallback !== '' ? $fallback : $text;
+    }
+    return $text;
+}
+
+function casa_get_display_phone() {
+    $raw = trim((string) get_option('casa_opt_global_phone', '477 289 25 21'));
+    return $raw !== '' ? $raw : '477 289 25 21';
+}
+
+function casa_get_whatsapp_url($message = '') {
+    $raw = trim((string) get_option('casa_opt_global_whatsapp', ''));
+    if ($raw === '') {
+        $raw = casa_get_display_phone();
+    }
+    if (preg_match('#^https?://#i', $raw)) {
+        if ($message === '' || strpos($raw, 'text=') !== false) {
+            return $raw;
+        }
+        $join = (strpos($raw, '?') !== false) ? '&' : '?';
+        return $raw . $join . 'text=' . rawurlencode($message);
+    }
+    $digits = preg_replace('/\D+/', '', $raw);
+    if ($digits === '') {
+        $digits = '4772892521';
+    }
+    if (strlen($digits) === 10) {
+        $digits = '52' . $digits;
+    } elseif (strlen($digits) === 11 && strpos($digits, '1') === 0) {
+        $digits = '52' . substr($digits, 1);
+    }
+    $url = 'https://wa.me/' . $digits;
+    if ($message !== '') {
+        $url .= '?text=' . rawurlencode($message);
+    }
+    return $url;
+}
+
+function casa_get_venue_geo() {
+    return array(
+        'lat'     => '21.1585368',
+        'lng'     => '-101.6992601',
+        'name'    => 'Casa de Piedra',
+        'address' => 'Av Cerro Gordo 270, Casa de Piedra, 37120 León de los Aldama, Gto.',
+    );
+}
+
+function casa_get_google_maps_url() {
+    $opt = trim((string) get_option('casa_opt_google_maps_link', ''));
+    if ($opt !== '') {
+        return $opt;
+    }
+    $geo = casa_get_venue_geo();
+    return 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($geo['lat'] . ',' . $geo['lng']);
+}
+
+function casa_get_google_maps_embed_url() {
+    $opt = trim((string) get_option('casa_opt_google_maps_embed', ''));
+    if ($opt !== '') {
+        return $opt;
+    }
+    $geo = casa_get_venue_geo();
+    return 'https://maps.google.com/maps?q=' . rawurlencode($geo['lat'] . ',' . $geo['lng']) . '&z=16&output=embed';
+}
+
+function casa_get_review_cards($prefix) {
+    $cards = array();
+    for ($i = 1; $i <= 3; $i++) {
+        $text = trim((string) get_option($prefix . $i . '_text', ''));
+        if ($text === '') {
+            continue;
+        }
+        $url = trim((string) get_option($prefix . $i . '_url', ''));
+        $cards[] = array(
+            'text'   => $text,
+            'author' => trim((string) get_option($prefix . $i . '_author', '')),
+            'url'    => $url,
+        );
+    }
+    return $cards;
+}
+
+function casa_get_apple_maps_url() {
+    $geo = casa_get_venue_geo();
+    return 'https://maps.apple.com/?ll=' . rawurlencode($geo['lat'] . ',' . $geo['lng']) . '&q=' . rawurlencode($geo['name']) . '&address=' . rawurlencode($geo['address']);
+}
+
 /**
  * Soporte Universal para Túneles de Cloudflare (Live Links / Local by Flywheel) y Múltiples Dominios:
  * Intercepta y corrige dinámicamente todas las URLs de imágenes (logos, portadas, metadatos y medios)
  * para que siempre utilicen el dominio activo actual en lugar de intentar cargar desde .local o localhost.
  */
-function casadepiedra_fix_tunnel_urls($value) {
-    if (is_string($value) && strpos($value, '/wp-content/') !== false) {
-        // Redirigir logotipos obsoletos, faltantes o solo-escudo al logotipo horizontal oficial entregado por el usuario
-        if (strpos($value, 'Logo_Header.png') !== false || strpos($value, 'Logo_Footer.png') !== false || strpos($value, '/2023/09/') !== false || strpos($value, 'Recurso-5') !== false || strpos($value, 'CDP-LOGO') !== false) {
-            return get_template_directory_uri() . '/assets/images/logo-navbar-oficial.png';
+function casadepiedra_theme_media_url($filename_or_url) {
+    if (!is_string($filename_or_url) || $filename_or_url === '') {
+        return '';
+    }
+    $path = $filename_or_url;
+    if (preg_match('#^https?://#i', $filename_or_url)) {
+        $parsed = wp_parse_url($filename_or_url, PHP_URL_PATH);
+        $path = $parsed ? $parsed : $filename_or_url;
+    }
+    $base = rawurldecode(basename(str_replace('\\', '/', $path)));
+    if ($base === '' || strpos($base, '.') === false) {
+        return '';
+    }
+    static $index = null;
+    if ($index === null) {
+        $index = array();
+        $root = get_template_directory() . '/assets';
+        if (is_dir($root)) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)
+            );
+            foreach ($iterator as $file) {
+                if ($file->isFile()) {
+                    $rel = str_replace('\\', '/', substr($file->getPathname(), strlen($root) + 1));
+                    $index[$file->getFilename()] = get_template_directory_uri() . '/assets/' . $rel;
+                }
+            }
         }
+    }
+    return isset($index[$base]) ? $index[$base] : '';
+}
+
+function casadepiedra_media_library_url_by_basename($filename_or_url) {
+    static $guard = false;
+    static $cache = array();
+
+    if ($guard || !is_string($filename_or_url) || $filename_or_url === '' || !function_exists('get_posts') || !did_action('init')) {
+        return '';
+    }
+    $needs_lookup = (
+        strpos($filename_or_url, '/themes/') !== false
+        || strpos($filename_or_url, '.local') !== false
+        || strpos($filename_or_url, 'assets/pdfs') !== false
+        || strpos($filename_or_url, 'assets/images') !== false
+    );
+    if (!$needs_lookup) {
+        return '';
+    }
+    $base = rawurldecode(basename(str_replace('\\', '/', $filename_or_url)));
+    if ($base === '' || strpos($base, '.') === false || stripos($base, 'Logo_Header') !== false) {
+        return '';
+    }
+    if (array_key_exists($base, $cache)) {
+        return $cache[$base];
+    }
+
+    $guard = true;
+    $found = get_posts(array(
+        'post_type' => 'attachment',
+        'post_status' => 'inherit',
+        'posts_per_page' => 1,
+        'fields' => 'ids',
+        'no_found_rows' => true,
+        'suppress_filters' => true,
+        'meta_query' => array(
+            array(
+                'key' => '_wp_attached_file',
+                'value' => $base,
+                'compare' => 'LIKE',
+            ),
+        ),
+    ));
+    $guard = false;
+
+    $url = '';
+    $attachment_id = (is_array($found) && isset($found[0])) ? (int) $found[0] : 0;
+    if ($attachment_id > 0) {
+        $rel = (string) get_post_meta($attachment_id, '_wp_attached_file', true);
+        if ($rel !== '' && stripos($rel, 'Logo_Header') === false) {
+            $uploads = wp_get_upload_dir();
+            $abs = !empty($uploads['basedir']) ? $uploads['basedir'] . '/' . ltrim($rel, '/') : '';
+            if ($abs !== '' && file_exists($abs) && !empty($uploads['baseurl'])) {
+                $url = trailingslashit($uploads['baseurl']) . ltrim($rel, '/');
+            }
+        }
+    }
+    $cache[$base] = $url;
+    return $url;
+}
+
+function casadepiedra_fix_tunnel_urls($value) {
+    if (!is_string($value) || $value === '') {
+        return $value;
+    }
+    $packaged = casadepiedra_theme_media_url($value);
+    if ($packaged) {
+        return $packaged;
+    }
+    $from_library = casadepiedra_media_library_url_by_basename($value);
+    if ($from_library) {
+        return $from_library;
+    }
+    if (function_exists('casa_is_theme_packaged_url') && casa_is_theme_packaged_url($value)) {
+        return $from_library ?: '';
+    }
+    if (strpos($value, '/wp-content/') !== false) {
         $parts = explode('/wp-content/', $value);
         if (count($parts) > 1 && !empty($parts[1])) {
             return content_url() . '/' . ltrim($parts[1], '/');
@@ -53,33 +263,66 @@ $casa_image_options = array(
     'casa_opt_global_transition_logo',
     'casa_opt_home_hero_img',
     'casa_opt_nosotros_portada',
+    'casa_opt_nosotros_hero_img',
     'casa_opt_nosotros_img1',
     'casa_opt_nosotros_img2',
-    'casa_opt_contacto_bg'
+    'casa_opt_contacto_bg',
+    'casa_opt_contacto_portada',
+    'casa_opt_espacios_portada',
+    'casa_opt_restaurantes_portada',
+    'casa_opt_eventos_portada',
+    'casa_opt_galeria_portada',
+    'casa_opt_privacidad_portada',
+    'casa_opt_footer_bg_image',
+    'casa_opt_mail_logo'
 );
 foreach ($casa_image_options as $opt) {
     add_filter("option_{$opt}", 'casadepiedra_fix_tunnel_urls', 99);
 }
 
-// Forzar el logotipo horizontal oficial actual sin importar el valor en BD
-add_filter('option_casa_opt_global_logo', function($value) {
-    return get_template_directory_uri() . '/assets/images/logo-navbar-oficial.png';
+add_filter('option_casa_opt_global_logo', function ($value) {
+    return function_exists('casa_usable_media') ? casa_usable_media($value) : $value;
 }, 100);
-add_filter('option_casa_opt_global_transition_logo', function($value) {
-    return get_template_directory_uri() . '/assets/images/escudo-animacion-blanco.png';
+add_filter('option_casa_opt_global_transition_logo', function ($value) {
+    return function_exists('casa_usable_media') ? casa_usable_media($value) : $value;
 }, 100);
 
-// 2. Filtrar metadatos de imágenes en Custom Post Types (Restaurantes, Espacios, Eventos)
-add_filter('get_post_metadata', function($value, $object_id, $meta_key, $single) {
-    if (in_array($meta_key, array('_restaurante_logo', '_espacio_portada', '_restaurante_portada', '_casadepiedra_gallery_ids')) && !empty($value)) {
-        if (is_string($value) && strpos($value, '/wp-content/') !== false) {
-            return casadepiedra_fix_tunnel_urls($value);
-        } elseif (is_array($value) && isset($value[0]) && is_string($value[0]) && strpos($value[0], '/wp-content/') !== false) {
-            $value[0] = casadepiedra_fix_tunnel_urls($value[0]);
-            return $value;
-        }
+// 2. Filtrar metadatos de imágenes/PDFs en Custom Post Types (Restaurantes, Espacios)
+add_filter('get_post_metadata', function($check, $object_id, $meta_key, $single) {
+    static $guard = false;
+    static $keys = array(
+        '_restaurante_logo',
+        '_espacio_portada',
+        '_restaurante_portada',
+        '_restaurante_hero_image',
+        '_restaurante_card_image',
+        '_restaurante_menu',
+        '_espacio_tarjeta_inicio',
+        '_espacio_portada_url',
+        '_espacio_plano_pdf',
+        '_espacio_panorama',
+    );
+    if ($guard || $check !== null || !in_array($meta_key, $keys, true) || !function_exists('get_metadata_raw')) {
+        return $check;
     }
-    return $value;
+    $guard = true;
+    $stored = get_metadata_raw('post', $object_id, $meta_key, false);
+    $guard = false;
+    if (!is_array($stored) || $stored === array()) {
+        return $check;
+    }
+    $mapped = array();
+    foreach ($stored as $item) {
+        $mapped[] = is_string($item) ? casadepiedra_fix_tunnel_urls($item) : $item;
+    }
+    if (!$single) {
+        return $mapped;
+    }
+    if (array_key_exists(0, $mapped)) {
+        return $mapped[0];
+    }
+    $first = reset($mapped);
+    return ($first !== false) ? $first : $check;
 }, 99, 4);
 
 // 3. Filtrar URLs de adjuntos nativos de WordPress (Media Library, thumbnails, galerías)
@@ -93,20 +336,34 @@ add_filter('wp_get_attachment_image_src', function($image) {
 
 // Dynamically add Espacios and Restaurantes to menu
 function casadepiedra_add_dynamic_dropdowns($items, $args) {
-    if ($args->theme_location == 'menu-principal') {
-        $espacios_parent = null;
-        $restaurantes_parent = null;
-        
-        foreach ($items as $item) {
-            $title = strtolower(trim($item->title));
-            if ($title === 'espacios') {
-                $espacios_parent = $item->ID;
-                $item->classes[] = 'menu-item-has-children';
-            } elseif ($title === 'restaurantes') {
-                $restaurantes_parent = $item->ID;
-                $item->classes[] = 'menu-item-has-children';
-            }
+    if (!is_object($args) || empty($args->theme_location) || $args->theme_location !== 'menu-principal') {
+        return $items;
+    }
+    if (!is_array($items)) {
+        return $items;
+    }
+    $espacios_parent = null;
+    $restaurantes_parent = null;
+
+    foreach ($items as $item) {
+        if (!is_object($item) || empty($item->title)) {
+            continue;
         }
+        $title = strtolower(trim((string) $item->title));
+        if ($title === 'espacios') {
+            $espacios_parent = $item->ID;
+            if (!isset($item->classes) || !is_array($item->classes)) {
+                $item->classes = array();
+            }
+            $item->classes[] = 'menu-item-has-children';
+        } elseif ($title === 'restaurantes') {
+            $restaurantes_parent = $item->ID;
+            if (!isset($item->classes) || !is_array($item->classes)) {
+                $item->classes = array();
+            }
+            $item->classes[] = 'menu-item-has-children';
+        }
+    }
         
         // Espacios
         if ($espacios_parent) {
@@ -171,40 +428,17 @@ function casadepiedra_add_dynamic_dropdowns($items, $args) {
                 $order++;
             }
         }
-    }
     return $items;
 }
 
 function casadepiedra_resolve_restaurante_logo($post_id) {
-    $logo = get_post_meta($post_id, '_restaurante_logo', true);
-    if (!empty($logo)) {
-        return $logo;
-    }
-    $title = get_the_title($post_id);
-    if (stripos($title, 'Valentina') !== false) {
-        return get_template_directory_uri() . '/assets/images/logos/valentina-logo.png';
-    }
-    if (stripos($title, 'Casa M') !== false || stripos($title, 'Casa-Mia') !== false) {
-        return get_template_directory_uri() . '/assets/images/logos/casa-mia-logo.png';
-    }
-    if (stripos($title, 'Argentilia') !== false) {
-        return get_template_directory_uri() . '/assets/images/logos/argentilia-logo.png';
-    }
-    if (stripos($title, 'Lucio') !== false) {
-        return get_template_directory_uri() . '/assets/images/logos/lucio-logo.png';
-    }
-    if (stripos($title, 'Manolo') !== false) {
-        return get_template_directory_uri() . '/assets/images/logos/manolo-logo.png';
-    }
-    if (stripos($title, 'Sato') !== false) {
-        return get_template_directory_uri() . '/assets/images/logos/sato-logo.png';
-    }
-    return '';
+    return casa_usable_media(get_post_meta($post_id, '_restaurante_logo', true));
 }
 
 function casadepiedra_resolve_restaurante_short_name($title) {
     if (stripos($title, 'Valentina') !== false) return 'Valentina';
     if (stripos($title, 'Casa M') !== false || stripos($title, 'Casa-Mia') !== false) return 'Casa Mía';
+    if (stripos($title, 'Sole Mio') !== false) return 'Sole Mio';
     if (stripos($title, 'Argentilia') !== false) return 'Argentilia';
     if (stripos($title, 'Lucio') !== false) return 'Lucio';
     if (stripos($title, 'Manolo') !== false) return 'Manolo';
@@ -218,105 +452,595 @@ function casadepiedra_resolve_restaurante_short_name($title) {
 }
 
 function casadepiedra_get_google_reviews_url($post_id) {
-    $custom = get_post_meta($post_id, '_restaurante_google_reviews_url', true);
-    if (!empty($custom)) {
-        return $custom;
+    return casa_actionable_url(get_post_meta((int) $post_id, '_restaurante_google_reviews_url', true));
+}
+
+function casa_actionable_url($url) {
+    $url = trim((string) $url);
+    if ($url === '' || $url === '#' || stripos($url, 'javascript:') === 0) {
+        return '';
     }
-    $title = get_the_title($post_id);
-    if (stripos($title, 'Sato') !== false) {
-        return 'https://www.google.com/maps/place/Sato+Casa+de+Piedra/@21.1596493,-101.7019348,1682m/data=!3m2!1e3!5s0x842bbf530842ac4b:0x4642591264eb2eec!4m8!3m7!1s0x842bbf53719c9f9d:0x1cfaf89360074060!8m2!3d21.1596493!4d-101.6993545!9m1!1b1!16s%2Fg%2F11bw62cb4y?entry=ttu&g_ep=EgoyMDI2MDcwNy4wIKXMDSoASAFQAw%3D%3D';
+    if (stripos($url, 'tel:') === 0) {
+        $digits = preg_replace('/[^0-9+]/', '', substr($url, 4));
+        return $digits !== '' ? 'tel:' . $digits : '';
     }
-    return 'https://www.google.com/maps/search/Casa+de+Piedra+Le%C3%B3n+Guanajuato+Restaurantes';
+    if (function_exists('casa_usable_media')) {
+        $ok = casa_usable_media($url);
+        if ($ok) {
+            return $ok;
+        }
+    }
+    if (function_exists('casa_is_theme_packaged_url') && casa_is_theme_packaged_url($url)) {
+        return '';
+    }
+    if (function_exists('casa_is_dead_media_url') && casa_is_dead_media_url($url)) {
+        return '';
+    }
+    return $url;
+}
+
+function casadepiedra_get_restaurante_maps_url($post_id) {
+    return casa_actionable_url(get_post_meta((int) $post_id, '_restaurante_maps_url', true));
+}
+
+function casadepiedra_get_menu_url($post_id) {
+    return casa_actionable_url(get_post_meta((int) $post_id, '_restaurante_menu', true));
 }
 
 function casadepiedra_resolve_restaurante_card_img($post_id) {
-    $custom = get_post_meta($post_id, '_restaurante_card_image', true);
-    if (!empty($custom)) {
+    $custom = casa_usable_media(get_post_meta($post_id, '_restaurante_card_image', true));
+    if ($custom) {
         return $custom;
     }
-    $title = get_the_title($post_id);
-    if (stripos($title, 'Sato') !== false) {
-        return get_template_directory_uri() . '/assets/images/sato/card.jpg';
-    }
-    return has_post_thumbnail($post_id) ? get_the_post_thumbnail_url($post_id, 'large') : '';
+    return casa_usable_media(has_post_thumbnail($post_id) ? get_the_post_thumbnail_url($post_id, 'large') : '');
 }
 
 function casadepiedra_resolve_restaurante_hero($post_id) {
-    $custom = get_post_meta($post_id, '_restaurante_hero_image', true);
-    if (!empty($custom)) {
+    $custom = casa_usable_media(get_post_meta($post_id, '_restaurante_hero_image', true));
+    if ($custom) {
         return $custom;
     }
-    $title = get_the_title($post_id);
-    if (stripos($title, 'Sato') !== false) {
-        return get_template_directory_uri() . '/assets/images/sato/banner.jpg';
+    $card = casadepiedra_resolve_restaurante_card_img($post_id);
+    if ($card) {
+        return $card;
     }
-    return has_post_thumbnail($post_id) ? get_the_post_thumbnail_url($post_id, 'full') : get_template_directory_uri() . '/assets/images/restaurante_hero_1779523131713.png';
+    return casa_usable_media(has_post_thumbnail($post_id) ? get_the_post_thumbnail_url($post_id, 'full') : '');
+}
+
+function casadepiedra_theme_file_url($relative) {
+    $rel = ltrim(str_replace('\\', '/', (string) $relative), '/');
+    if ($rel === '') {
+        return '';
+    }
+    $abs = get_template_directory() . '/' . $rel;
+    if (file_exists($abs)) {
+        return get_template_directory_uri() . '/' . $rel;
+    }
+    return '';
+}
+
+function casadepiedra_resolve_theme_image_from_url($url) {
+    return casa_usable_media($url);
+}
+
+function casadepiedra_espacio_fallback_by_title($title) {
+    return '';
+}
+
+function casa_espacio_capacidad($post_id) {
+    $raw = trim((string) get_post_meta((int) $post_id, '_espacio_capacidad', true));
+    if ($raw === '') {
+        return '';
+    }
+    return trim(str_ireplace(array('personas', 'px', 'hasta'), '', $raw));
+}
+
+function casa_espacio_m2($post_id) {
+    $raw = trim((string) get_post_meta((int) $post_id, '_espacio_m2', true));
+    if ($raw === '') {
+        return '';
+    }
+    return trim(str_ireplace(array('m2', 'm²', 'metros'), '', $raw));
+}
+
+function casa_fix_stripped_unicode($text) {
+    $text = (string) $text;
+    return preg_replace_callback('/u00([0-9a-fA-F]{2})/', function ($match) {
+        $char = html_entity_decode('&#x' . $match[1] . ';', ENT_QUOTES, 'UTF-8');
+        return ($char !== '' && $char !== '&#x' . $match[1] . ';') ? $char : $match[0];
+    }, $text);
+}
+
+function casa_espacio_tour_decode($post_id) {
+    $raw = get_post_meta((int) $post_id, '_espacio_panorama_tour', true);
+    $decoded = is_string($raw) ? json_decode($raw, true) : null;
+    if (!is_array($decoded)) {
+        $decoded = array();
+    }
+    $stops = array();
+    foreach ($decoded as $stop) {
+        if (!is_array($stop)) {
+            continue;
+        }
+        $id = sanitize_key($stop['id'] ?? '');
+        $src = esc_url_raw($stop['src'] ?? '');
+        $name = casa_fix_stripped_unicode(sanitize_text_field($stop['name'] ?? ''));
+        if ($id === '' || ($src === '' && $name === '')) {
+            continue;
+        }
+        $links = array();
+        if (!empty($stop['links']) && is_array($stop['links'])) {
+            foreach ($stop['links'] as $link) {
+                if (!is_array($link)) {
+                    continue;
+                }
+                $to = sanitize_key($link['to'] ?? '');
+                if ($to === '' || $to === $id) {
+                    continue;
+                }
+                $links[] = array(
+                    'to' => $to,
+                    'yaw' => (float) ($link['yaw'] ?? 0),
+                    'pitch' => (float) ($link['pitch'] ?? -0.45),
+                );
+            }
+        }
+        $stops[] = array(
+            'id' => $id,
+            'name' => $name !== '' ? $name : 'Parada',
+            'src' => $src,
+            'links' => $links,
+        );
+    }
+    if (!$stops) {
+        $single = trim((string) get_post_meta((int) $post_id, '_espacio_panorama', true));
+        if ($single !== '') {
+            $stops[] = array(
+                'id' => 'principal',
+                'name' => 'Punto principal',
+                'src' => $single,
+                'links' => array(),
+            );
+        }
+    }
+    $ids = array();
+    foreach ($stops as $stop) {
+        $ids[$stop['id']] = true;
+    }
+    foreach ($stops as $index => $stop) {
+        $stops[$index]['links'] = array_values(array_filter($stop['links'], function ($link) use ($ids) {
+            return isset($ids[$link['to']]);
+        }));
+    }
+    return $stops;
+}
+
+function casa_espacio_tour_stations($post_id) {
+    $stops = casa_espacio_tour_decode($post_id);
+    return array_values(array_filter($stops, function ($stop) {
+        return $stop['src'] !== '';
+    }));
+}
+
+function casadepiedra_resolve_espacio_plano($post_id) {
+    $custom = trim((string) get_post_meta((int) $post_id, '_espacio_plano_pdf', true));
+    if ($custom === '') {
+        return '';
+    }
+    if (function_exists('casa_usable_media')) {
+        $ok = casa_usable_media($custom);
+        if ($ok) {
+            return $ok;
+        }
+    }
+    if (function_exists('casa_is_theme_packaged_url') && casa_is_theme_packaged_url($custom)) {
+        return '';
+    }
+    if (function_exists('casa_is_dead_media_url') && casa_is_dead_media_url($custom)) {
+        return '';
+    }
+    return $custom;
+}
+
+function casadepiedra_resolve_espacio_card_img($post_id) {
+    $post_id = (int) $post_id;
+    foreach (array('_espacio_tarjeta_inicio', '_espacio_portada', '_espacio_portada_url') as $key) {
+        $val = get_post_meta($post_id, $key, true);
+        if (!empty($val)) {
+            return casadepiedra_resolve_theme_image_from_url($val);
+        }
+    }
+    if (has_post_thumbnail($post_id)) {
+        $url = get_the_post_thumbnail_url($post_id, 'large');
+        if ($url) {
+            return casadepiedra_resolve_theme_image_from_url($url);
+        }
+    }
+    return '';
+}
+
+function casadepiedra_resolve_espacio_hero($post_id) {
+    $post_id = (int) $post_id;
+    foreach (array('_espacio_portada', '_espacio_tarjeta_inicio', '_espacio_portada_url') as $key) {
+        $val = get_post_meta($post_id, $key, true);
+        if (!empty($val)) {
+            return casadepiedra_resolve_theme_image_from_url($val);
+        }
+    }
+    if (has_post_thumbnail($post_id)) {
+        $url = get_the_post_thumbnail_url($post_id, 'full');
+        if ($url) {
+            return casadepiedra_resolve_theme_image_from_url($url);
+        }
+    }
+    return '';
 }
 
 
 function casadepiedra_resolve_restaurante_gallery($post_id) {
-    $title = get_the_title($post_id);
-    if (stripos($title, 'Sato') !== false) {
-        return array(
-            get_template_directory_uri() . '/assets/images/sato/gallery-1.jpg',
-            get_template_directory_uri() . '/assets/images/sato/gallery-2.jpg',
-            get_template_directory_uri() . '/assets/images/sato/gallery-3.jpg',
-            get_template_directory_uri() . '/assets/images/sato/card.jpg',
-            get_template_directory_uri() . '/assets/images/sato/banner.jpg'
-        );
+    $urls = casa_gallery_urls_from_ids(get_post_meta($post_id, '_casadepiedra_gallery_ids', true));
+    foreach (array(
+        casadepiedra_resolve_restaurante_hero($post_id),
+        casadepiedra_resolve_restaurante_card_img($post_id),
+    ) as $extra) {
+        if ($extra && !in_array($extra, $urls, true)) {
+            $urls[] = $extra;
+        }
     }
-    return array();
+    return $urls;
 }
 
 add_filter('wp_nav_menu_objects', 'casadepiedra_add_dynamic_dropdowns', 10, 2);
 
-// 2. Enqueue Scripts & Styles
+function casa_galeria_attachment_item($id) {
+    $id = (int) $id;
+    if ($id <= 0) {
+        return null;
+    }
+    $full = wp_get_attachment_image_url($id, 'full');
+    if (!$full) {
+        return null;
+    }
+    $thumb = wp_get_attachment_image_url($id, 'medium_large');
+    if (!$thumb) {
+        $thumb = wp_get_attachment_image_url($id, 'large') ?: $full;
+    }
+    $terms = get_the_terms($id, 'galeria_tag');
+    $slugs = array();
+    if ($terms && !is_wp_error($terms)) {
+        foreach ($terms as $term) {
+            $slugs[] = $term->slug;
+        }
+    }
+    $tag_classes = $slugs ? implode(' ', array_map(function ($s) {
+        return 'tag-' . $s;
+    }, $slugs)) : '';
+    return array(
+        'full' => $full,
+        'thumb' => $thumb,
+        'srcset' => wp_get_attachment_image_srcset($id, 'medium_large') ?: '',
+        'sizes' => '(max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw',
+        'title' => get_the_title($id) ?: 'Fotografía',
+        'tag' => $slugs ? $slugs[0] : '',
+        'tags_classes' => $tag_classes,
+        'class' => trim('gallery-item luxury-card ' . $tag_classes),
+    );
+}
+
+function casa_galeria_random_from($items, $slug = '') {
+    $pool = array();
+    foreach ((array) $items as $item) {
+        if ($slug === '' || (!empty($item['tags_classes']) && strpos($item['tags_classes'], 'tag-' . $slug) !== false)) {
+            $pool[] = $item;
+        }
+    }
+    if (empty($pool)) {
+        return null;
+    }
+    return $pool[array_rand($pool)];
+}
+
+function casa_galeria_cover_urls($items, $slug = '') {
+    $urls = array();
+    foreach ((array) $items as $item) {
+        if ($slug === '' || (!empty($item['tags_classes']) && strpos($item['tags_classes'], 'tag-' . $slug) !== false)) {
+            $url = !empty($item['thumb']) ? $item['thumb'] : $item['full'];
+            if ($url) {
+                $urls[] = $url;
+            }
+        }
+    }
+    return array_values(array_unique($urls));
+}
+
+add_action('template_redirect', function () {
+    if (is_page('galeria')) {
+        nocache_headers();
+        if (!headers_sent()) {
+            header('Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0');
+            header('Pragma: no-cache');
+        }
+    }
+});
+
+function casa_needs_gallery_assets() {
+    return is_front_page() || is_page('galeria') || is_singular(array('espacios', 'restaurantes'));
+}
+
+function casa_lcp_image_url() {
+    if (is_front_page()) {
+        return casa_opt_media('casa_opt_home_hero_img');
+    }
+    if (is_post_type_archive('espacios') || is_page('espacios')) {
+        return casa_opt_media('casa_opt_espacios_portada');
+    }
+    if (is_post_type_archive('restaurantes') || is_page('restaurantes')) {
+        return casa_opt_media('casa_opt_restaurantes_portada');
+    }
+    if (is_post_type_archive('eventos') || is_page('eventos')) {
+        return casa_opt_media('casa_opt_eventos_portada');
+    }
+    if (is_page('galeria')) {
+        return casa_opt_media('casa_opt_galeria_portada');
+    }
+    if (is_page(array('quienes-somos', 'nosotros'))) {
+        return casa_opt_media('casa_opt_nosotros_portada');
+    }
+    if (is_page('contacto')) {
+        return casa_opt_media('casa_opt_contacto_portada');
+    }
+    if (is_page('aviso-de-privacidad')) {
+        return casa_opt_media('casa_opt_privacidad_portada');
+    }
+    if (is_singular('espacios')) {
+        return casadepiedra_resolve_espacio_hero(get_the_ID());
+    }
+    if (is_singular('restaurantes')) {
+        return casadepiedra_resolve_restaurante_hero(get_the_ID());
+    }
+    if (is_singular('eventos')) {
+        if (has_post_thumbnail()) {
+            return get_the_post_thumbnail_url(null, 'full');
+        }
+        return casa_opt_media('casa_opt_eventos_portada');
+    }
+    return '';
+}
+
+add_action('wp_head', function () {
+    echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
+    echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+    echo '<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>' . "\n";
+    $lcp = casa_lcp_image_url();
+    if ($lcp) {
+        echo '<link rel="preload" as="image" href="' . esc_url($lcp) . '" fetchpriority="high">' . "\n";
+    }
+}, 0);
+
 function casadepiedra_scripts() {
-    // Estilos principales
-    wp_enqueue_style('casadepiedra-style', get_stylesheet_uri(), array(), '3.5.0');
-    
-    // GSAP para animaciones
-    wp_enqueue_script('gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js', array(), null, true);
-    wp_enqueue_script('gsap-scrolltrigger', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js', array('gsap'), null, true);
-    // JS Core and libraries
-    wp_enqueue_script('imagesloaded');
-    wp_enqueue_script('masonry');
-    wp_enqueue_style('glightbox-css', 'https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css', array(), '3.2.0');
-    wp_enqueue_script('glightbox', 'https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js', array(), '3.2.0', true);
-    
-    // Anime.js para transiciones fluidas de página
-    wp_enqueue_script('animejs', 'https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js', array(), null, true);
-    
-    // Lenis Smooth Scroll
-    wp_enqueue_script('lenis', 'https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js', array(), null, true);
-    
-    // Vanilla JS App
-    wp_enqueue_script('casadepiedra-app', get_template_directory_uri() . '/assets/js/app.js', array('gsap', 'gsap-scrolltrigger', 'glightbox', 'masonry', 'animejs', 'lenis'), '3.5.2', true);
-    // Favicon Animado Continues Transmutation
-    wp_enqueue_script('casadepiedra-animated-favicon', get_template_directory_uri() . '/assets/js/animated-favicon.js', array(), '3.6.0', true);
+    wp_enqueue_style(
+        'casa-fonts',
+        'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Great+Vibes&family=Inter:wght@400;500;600&display=swap',
+        array(),
+        null
+    );
+    wp_enqueue_style('casadepiedra-style', get_stylesheet_uri(), array('casa-fonts'), '4.0.9');
+
+    $defer = array('in_footer' => true, 'strategy' => 'defer');
+    $gallery = casa_needs_gallery_assets();
+
+    wp_enqueue_script('gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js', array(), '3.12.2', $defer);
+    wp_enqueue_script('gsap-scrolltrigger', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js', array('gsap'), '3.12.2', $defer);
+
+    if ($gallery) {
+        wp_enqueue_style('glightbox-css', 'https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css', array(), '3.2.0');
+        wp_enqueue_script('glightbox', 'https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js', array(), '3.2.0', $defer);
+    }
+
+    wp_enqueue_script('animejs', get_template_directory_uri() . '/assets/js/anime.min.js', array(), '3.2.1', $defer);
+
+    $deps = array('gsap', 'gsap-scrolltrigger', 'animejs');
+    if (!wp_is_mobile()) {
+        wp_enqueue_script('lenis', 'https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.29/bundled/lenis.min.js', array(), '1.0.29', $defer);
+        $deps[] = 'lenis';
+    }
+    if ($gallery) {
+        $deps[] = 'glightbox';
+    }
+    wp_enqueue_script('casadepiedra-app', get_template_directory_uri() . '/assets/js/app.js', $deps, '3.6.7', $defer);
+    wp_enqueue_script('casadepiedra-animated-favicon', get_template_directory_uri() . '/assets/js/animated-favicon.js', array(), '4.0.1', $defer);
     wp_add_inline_script('casadepiedra-animated-favicon', 'window.casadepiedraThemeUrl = "' . esc_js(get_template_directory_uri()) . '";', 'before');
+
+    if (is_singular('espacios') && function_exists('casa_espacio_tour_stations')) {
+        $tour = casa_espacio_tour_stations(get_queried_object_id());
+        if (!empty($tour)) {
+            wp_enqueue_script('casa-espacio-panorama', get_template_directory_uri() . '/assets/js/espacio-panorama.js', array(), '1.2.0', $defer);
+        }
+    }
 }
 add_action('wp_enqueue_scripts', 'casadepiedra_scripts');
 
-// Desactivar el favicon predeterminado de WordPress para evitar conflictos con nuestro Favicon programado
+add_filter('style_loader_tag', function ($html, $handle) {
+    if ($handle === 'glightbox-css') {
+        $html = str_replace("media='all'", "media='print' onload=\"this.onload=null;this.media='all'\"", $html);
+        $html = str_replace('media="all"', 'media="print" onload="this.onload=null;this.media=\'all\'"', $html);
+    }
+    return $html;
+}, 10, 2);
+
+add_action('init', function () {
+    remove_action('wp_head', 'print_emoji_detection_script', 7);
+    remove_action('wp_print_styles', 'print_emoji_styles');
+    remove_action('admin_print_scripts', 'print_emoji_detection_script');
+    remove_action('admin_print_styles', 'print_emoji_styles');
+    remove_action('wp_head', 'wp_oembed_add_discovery_links');
+    remove_action('wp_head', 'wp_oembed_add_host_js');
+    remove_action('wp_head', 'rsd_link');
+    remove_action('wp_head', 'wlwmanifest_link');
+    remove_action('wp_head', 'wp_generator');
+}, 20);
+
+// Favicon estático para Google (/favicon.ico + apple-touch). El de la pestaña se anima en JS.
 remove_action('wp_head', 'wp_site_icon', 99);
 add_filter('site_icon_meta_tags', '__return_empty_array', 999);
+remove_action('do_faviconico', 'do_faviconico');
+add_action('do_faviconico', function () {
+    $url = function_exists('casa_google_favicon_url') ? casa_google_favicon_url() : '';
+    if ($url) {
+        wp_redirect($url, 301);
+        exit;
+    }
+});
 
-// Output del Favicon Inicial Transparente de Casa de Piedra en <head>
-add_action('wp_head', function() {
-    $fav_init = get_template_directory_uri() . '/assets/images/favicons/favicon-1.png';
-    echo "\n<!-- Ex Hacienda Casa de Piedra Favicon Oficial -->\n";
-    echo '<link id="casa-dynamic-favicon" rel="icon" type="image/png" href="' . esc_url($fav_init) . '" />' . "\n";
+add_action('wp_head', function () {
+    $static = function_exists('casa_google_favicon_url') ? casa_google_favicon_url() : '';
+    $animated = get_template_directory_uri() . '/assets/images/favicons/favicon-1.png';
+    echo "\n<!-- Casa de Piedra: favicon Google (estático) + pestaña (animado) -->\n";
+    if ($static) {
+        echo '<link id="casa-google-favicon" rel="icon" type="image/png" sizes="48x48" href="' . esc_url($static) . '" />' . "\n";
+        echo '<link rel="apple-touch-icon" sizes="180x180" href="' . esc_url($static) . '" />' . "\n";
+    }
+    echo '<link id="casa-dynamic-favicon" rel="icon" type="image/png" sizes="32x32" href="' . esc_url($animated) . '" />' . "\n";
 }, 1);
 
 function casadepiedra_admin_scripts($hook) {
-    // Load on post pages AND our new admin panel pages
     if (strpos($hook, 'casa-panel') !== false || in_array($hook, array('post.php', 'post-new.php'))) {
         wp_enqueue_media();
-        wp_enqueue_script('casadepiedra-admin-gallery', get_template_directory_uri() . '/assets/js/admin-gallery.js', array('jquery'), null, true);
+        wp_enqueue_script('casadepiedra-admin-gallery', get_template_directory_uri() . '/assets/js/admin-gallery.js', array('jquery'), '4.1.0', true);
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        if ($screen && $screen->post_type === 'espacios' && in_array($hook, array('post.php', 'post-new.php'), true)) {
+            wp_enqueue_script('casa-espacio-panorama', get_template_directory_uri() . '/assets/js/espacio-panorama.js', array(), '1.2.0', true);
+            wp_enqueue_script('casa-espacio-panorama-admin', get_template_directory_uri() . '/assets/js/espacio-panorama-admin.js', array('jquery', 'casa-espacio-panorama'), '1.2.0', true);
+        }
+        wp_localize_script('casadepiedra-admin-gallery', 'casaGaleriaAdmin', array(
+            'ajax' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('casa_galeria_tags'),
+        ));
     }
 }
 add_action('admin_enqueue_scripts', 'casadepiedra_admin_scripts');
+
+function casa_galeria_sync_tags_option() {
+    $terms = get_terms(array('taxonomy' => 'galeria_tag', 'hide_empty' => false));
+    if (is_wp_error($terms) || empty($terms)) {
+        update_option('casa_opt_galeria_etiquetas', '');
+        return array();
+    }
+    $names = wp_list_pluck($terms, 'name');
+    update_option('casa_opt_galeria_etiquetas', implode(', ', $names));
+    return $terms;
+}
+
+function casa_galeria_ensure_tags() {
+    $terms = get_terms(array('taxonomy' => 'galeria_tag', 'hide_empty' => false));
+    if (!is_wp_error($terms) && !empty($terms)) {
+        return $terms;
+    }
+    $raw = get_option('casa_opt_galeria_etiquetas', 'Boda, Cumpleaños, Eventos empresariales, Convenciones');
+    $names = array_filter(array_map('trim', explode(',', (string) $raw)));
+    if (empty($names)) {
+        $names = array('Boda', 'Cumpleaños', 'Eventos empresariales', 'Convenciones');
+    }
+    foreach ($names as $name) {
+        if (!term_exists($name, 'galeria_tag')) {
+            wp_insert_term($name, 'galeria_tag');
+        }
+    }
+    return casa_galeria_sync_tags_option();
+}
+
+function casa_galeria_ajax_guard() {
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(array('message' => 'Sin permisos.'), 403);
+    }
+    check_ajax_referer('casa_galeria_tags', 'nonce');
+}
+
+function casa_galeria_term_payload($term) {
+    return array(
+        'id' => (int) $term->term_id,
+        'name' => $term->name,
+        'slug' => $term->slug,
+        'count' => (int) $term->count,
+    );
+}
+
+add_action('wp_ajax_casa_galeria_create_tag', function () {
+    casa_galeria_ajax_guard();
+    $name = sanitize_text_field(wp_unslash($_POST['name'] ?? ''));
+    if ($name === '') {
+        wp_send_json_error(array('message' => 'Escribe un nombre para la etiqueta.'));
+    }
+    if (term_exists($name, 'galeria_tag')) {
+        wp_send_json_error(array('message' => 'Esa etiqueta ya existe. Elígela en la lista.'));
+    }
+    $created = wp_insert_term($name, 'galeria_tag');
+    if (is_wp_error($created)) {
+        wp_send_json_error(array('message' => $created->get_error_message()));
+    }
+    $term = get_term((int) $created['term_id'], 'galeria_tag');
+    casa_galeria_sync_tags_option();
+    wp_send_json_success(array('tag' => casa_galeria_term_payload($term)));
+});
+
+add_action('wp_ajax_casa_galeria_rename_tag', function () {
+    casa_galeria_ajax_guard();
+    $id = absint($_POST['id'] ?? 0);
+    $name = sanitize_text_field(wp_unslash($_POST['name'] ?? ''));
+    if (!$id || $name === '') {
+        wp_send_json_error(array('message' => 'Nombre no válido.'));
+    }
+    $updated = wp_update_term($id, 'galeria_tag', array('name' => $name));
+    if (is_wp_error($updated)) {
+        wp_send_json_error(array('message' => $updated->get_error_message()));
+    }
+    $term = get_term($id, 'galeria_tag');
+    casa_galeria_sync_tags_option();
+    wp_send_json_success(array('tag' => casa_galeria_term_payload($term)));
+});
+
+add_action('wp_ajax_casa_galeria_delete_tag', function () {
+    casa_galeria_ajax_guard();
+    $id = absint($_POST['id'] ?? 0);
+    if (!$id) {
+        wp_send_json_error(array('message' => 'Etiqueta no válida.'));
+    }
+    $deleted = wp_delete_term($id, 'galeria_tag');
+    if (is_wp_error($deleted) || !$deleted) {
+        wp_send_json_error(array('message' => 'No se pudo eliminar.'));
+    }
+    casa_galeria_sync_tags_option();
+    wp_send_json_success();
+});
+
+add_action('wp_ajax_casa_galeria_set_image_tags', function () {
+    casa_galeria_ajax_guard();
+    $attachment_id = absint($_POST['attachment_id'] ?? 0);
+    $term_ids = isset($_POST['term_ids']) ? array_map('absint', (array) $_POST['term_ids']) : array();
+    $term_ids = array_values(array_filter($term_ids));
+    if (!$attachment_id || get_post_type($attachment_id) !== 'attachment') {
+        wp_send_json_error(array('message' => 'Fotografía no válida.'));
+    }
+    $result = wp_set_object_terms($attachment_id, $term_ids, 'galeria_tag', false);
+    if (is_wp_error($result)) {
+        wp_send_json_error(array('message' => $result->get_error_message()));
+    }
+    wp_send_json_success(array('term_ids' => $term_ids));
+});
+
+add_action('wp_ajax_casa_galeria_save_ids', function () {
+    casa_galeria_ajax_guard();
+    $ids = sanitize_text_field(wp_unslash($_POST['ids'] ?? ''));
+    $clean = array();
+    foreach (explode(',', $ids) as $id) {
+        $id = absint($id);
+        if ($id && get_post_type($id) === 'attachment') {
+            $clean[] = $id;
+        }
+    }
+    update_option('casa_opt_galeria_imagenes', implode(',', array_unique($clean)));
+    wp_send_json_success(array('ids' => implode(',', $clean)));
+});
 
 // 3. Register Custom Post Types & Taxonomies
 function casadepiedra_register_cpts() {
@@ -334,8 +1058,8 @@ function casadepiedra_register_cpts() {
             'new_item_name' => 'Nombre de Nueva Etiqueta',
             'menu_name' => 'Etiquetas de Fotos',
         ),
-        'show_ui' => true,
-        'show_admin_column' => true,
+        'show_ui' => false,
+        'show_admin_column' => false,
         'query_var' => true,
         'show_in_rest' => true,
     ));
@@ -425,7 +1149,8 @@ function casadepiedra_restaurante_meta_callback($post) {
     $hero_image = get_post_meta($post->ID, '_restaurante_hero_image', true);
     $card_image = get_post_meta($post->ID, '_restaurante_card_image', true);
     $google_reviews_url = get_post_meta($post->ID, '_restaurante_google_reviews_url', true);
-    $rating = get_post_meta($post->ID, '_restaurante_rating', true) ?: '4.9';
+    $maps_url = get_post_meta($post->ID, '_restaurante_maps_url', true);
+    $rating = get_post_meta($post->ID, '_restaurante_rating', true);
     $cocina = get_post_meta($post->ID, '_restaurante_cocina', true);
 
     echo '<style>
@@ -453,8 +1178,8 @@ function casadepiedra_restaurante_meta_callback($post) {
     echo '<div class="cdp-meta-field"><label for="restaurante_cocina">Especialidad Gastronómica (Etiqueta Amarilla):</label>';
     echo '<input type="text" id="restaurante_cocina" name="restaurante_cocina" value="' . esc_attr($cocina) . '" placeholder="Ej: Alta Cocina Japonesa & Nikkei" /></div>';
 
-    echo '<div class="cdp-meta-field"><label for="restaurante_rating">Calificación ⭐:</label>';
-    echo '<input type="text" id="restaurante_rating" name="restaurante_rating" value="' . esc_attr($rating) . '" placeholder="Ej: 4.9" /></div>';
+    echo '<div class="cdp-meta-field"><label for="restaurante_rating">Calificación ⭐ (solo si es real, no inventar):</label>';
+    echo '<input type="text" id="restaurante_rating" name="restaurante_rating" value="' . esc_attr($rating) . '" placeholder="Dejar vacío si no hay calificación oficial" /></div>';
 
     echo '<div class="cdp-meta-field"><label>Logo Oficial PNG/SVG:</label>';
     echo '<input type="hidden" id="restaurante_logo" name="restaurante_logo" value="' . esc_attr($logo_url) . '" />';
@@ -492,6 +1217,9 @@ function casadepiedra_restaurante_meta_callback($post) {
 
     echo '<div class="cdp-meta-field"><label for="restaurante_google_reviews_url">Enlace Directo a Reseñas en Google Maps (Botón ⭐):</label>';
     echo '<input type="url" id="restaurante_google_reviews_url" name="restaurante_google_reviews_url" value="' . esc_attr($google_reviews_url) . '" placeholder="https://www.google.com/maps/place/..." /></div>';
+
+    echo '<div class="cdp-meta-field"><label for="restaurante_maps_url">Ubicación en Google Maps (si es distinta al recinto):</label>';
+    echo '<input type="url" id="restaurante_maps_url" name="restaurante_maps_url" value="' . esc_attr($maps_url) . '" placeholder="Vacío = se oculta el botón Ubicación" /></div>';
 
     echo '<div class="cdp-meta-field"><label for="restaurante_menu">Enlace al Menú Gastronómico (URL o PDF):</label>';
     echo '<div style="display:flex; gap:8px;"><input type="url" id="restaurante_menu" name="restaurante_menu" value="' . esc_attr($menu_url) . '" />';
@@ -576,6 +1304,7 @@ function casadepiedra_save_restaurante_meta($post_id) {
         '_restaurante_hero_image' => 'restaurante_hero_image',
         '_restaurante_card_image' => 'restaurante_card_image',
         '_restaurante_google_reviews_url' => 'restaurante_google_reviews_url',
+        '_restaurante_maps_url' => 'restaurante_maps_url',
         '_restaurante_rating' => 'restaurante_rating',
         '_restaurante_cocina' => 'restaurante_cocina'
     );
@@ -589,27 +1318,35 @@ function casadepiedra_save_restaurante_meta($post_id) {
 add_action('save_post_restaurantes', 'casadepiedra_save_restaurante_meta');
 
 function casadepiedra_get_reserva_url($post_id) {
-    $title = get_the_title($post_id);
-    if (stripos($title, 'Sato') !== false) {
-        return 'https://api.whatsapp.com/send?phone=5214773949444&text=!Hola!%20quiero%20hacer%20una%20reservación';
+    $valor = trim((string) get_post_meta($post_id, '_restaurante_reserva_valor', true));
+    if ($valor === '') {
+        return '';
+    }
+    if (preg_match('#^(https?:)?//#i', $valor) || stripos($valor, 'wa.me') !== false || stripos($valor, 'wa.link') !== false) {
+        return casa_actionable_url($valor);
     }
     $tipo = get_post_meta($post_id, '_restaurante_reserva_tipo', true);
-    $valor = get_post_meta($post_id, '_restaurante_reserva_valor', true);
-    
-    if (empty($valor)) return esc_url(home_url('/contacto'));
-    
     if ($tipo === 'tel') {
-        return 'tel:' . preg_replace('/[^0-9+]/', '', $valor);
-    } elseif ($tipo === 'whatsapp') {
-        return 'https://wa.me/' . preg_replace('/[^0-9]/', '', $valor);
-    } else {
-        return esc_url($valor);
+        $tel = preg_replace('/[^0-9+]/', '', $valor);
+        return $tel !== '' ? 'tel:' . $tel : '';
     }
+    if ($tipo === 'whatsapp') {
+        $digits = preg_replace('/[^0-9]/', '', $valor);
+        if ($digits === '') {
+            return '';
+        }
+        if (strlen($digits) === 10) {
+            $digits = '52' . $digits;
+        }
+        return 'https://wa.me/' . $digits;
+    }
+    return '';
 }
 
 // 5. Cargar Panel de Administración Global
 require_once get_template_directory() . '/inc/admin-panel.php';
 require_once get_template_directory() . '/inc/seo.php';
+require_once get_template_directory() . '/inc/seo-admin.php';
 
 // 7. Meta Box para Galería (Restaurantes y Espacios)
 function casadepiedra_add_gallery_meta() { 
@@ -661,7 +1398,7 @@ function casadepiedra_gallery_callback($post) {
         foreach ($ids_array as $id) {
             $img = wp_get_attachment_image_src($id, 'thumbnail');
             if ($img) {
-                echo '<div class="casa-gallery-item" data-id="'.esc_attr($id).'" style="display:inline-block; position:relative;"><img src="'.esc_url($img[0]).'" style="width:95px; height:75px; object-fit:cover; display:block; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);" /><button type="button" class="casa-remove-single-img-btn" data-id="'.esc_attr($id).'" title="Eliminar foto individual" style="position:absolute; top:-6px; right:-6px; background:#dc2626; color:#fff; border:2px solid #fff; border-radius:50%; width:24px; height:24px; font-size:12px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.25); line-height:1;">🗑️</button></div>';
+                echo '<div class="casa-gallery-item" data-id="'.esc_attr($id).'" style="display:inline-block; position:relative; overflow:visible; z-index:1;"><img src="'.esc_url($img[0]).'" style="width:95px; height:75px; object-fit:cover; display:block; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);" /><button type="button" class="casa-remove-single-img-btn" data-id="'.esc_attr($id).'" title="Eliminar foto individual" style="position:absolute; top:-6px; right:-6px; z-index:5; background:#dc2626; color:#fff; border:2px solid #fff; border-radius:50%; width:24px; height:24px; font-size:12px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.25); line-height:1;">×</button></div>';
             }
         }
     }
@@ -694,6 +1431,8 @@ function casadepiedra_espacio_meta_callback($post) {
     $rango_personas = get_post_meta($post->ID, '_espacio_rango_personas', true);
     $m2 = get_post_meta($post->ID, '_espacio_m2', true);
     $plano_pdf = get_post_meta($post->ID, '_espacio_plano_pdf', true);
+    $tarjeta_inicio = get_post_meta($post->ID, '_espacio_tarjeta_inicio', true);
+    $subt = get_post_meta($post->ID, '_espacio_subt', true);
     
     $nombre_espacio = !empty($post->post_title) ? $post->post_title : 'Espacio';
 
@@ -714,6 +1453,16 @@ function casadepiedra_espacio_meta_callback($post) {
     }
     echo '<small style="color:#64748b; display:block; margin-top:6px;">Imagen superior de alta resolución al entrar al salón.</small></div>';
 
+    echo '<div class="cdp-meta-field" style="margin-top:20px;"><label for="espacio_tarjeta_inicio">Imagen de Tarjeta del Inicio (Index):</label>';
+    echo '<div style="display:flex; gap:8px;">';
+    echo '<input type="url" id="espacio_tarjeta_inicio" name="espacio_tarjeta_inicio" value="' . esc_attr($tarjeta_inicio) . '" placeholder="https://..." />';
+    echo '<button type="button" id="btn_upload_espacio_tarjeta" class="cdp-btn-gold" style="white-space:nowrap;">Seleccionar Imagen</button>';
+    echo '</div>';
+    if ($tarjeta_inicio) {
+        echo '<img src="' . esc_url($tarjeta_inicio) . '" class="cdp-img-preview" />';
+    }
+    echo '<small style="color:#64748b; display:block; margin-top:6px;">Imagen que se mostrará en las tarjetas de la página de inicio para este salón.</small></div>';
+
     echo '<div class="cdp-meta-field"><label for="espacio_plano_pdf">Archivo PDF de Planos y Distribución:</label>';
     echo '<div style="display:flex; gap:8px;">';
     echo '<input type="url" id="espacio_plano_pdf" name="espacio_plano_pdf" value="' . esc_attr($plano_pdf) . '" placeholder="https://...plano.pdf" />';
@@ -727,6 +1476,9 @@ function casadepiedra_espacio_meta_callback($post) {
     echo '<div class="cdp-meta-card">';
     echo '<h4>👥 Capacidad & Especificaciones del Salón</h4>';
 
+    echo '<div class="cdp-meta-field"><label for="espacio_subt">Subtítulo del banner:</label>';
+    echo '<input type="text" id="espacio_subt" name="espacio_subt" value="' . esc_attr($subt) . '" placeholder="Ej: Jardín de eventos" /></div>';
+
     echo '<div class="cdp-meta-field"><label for="espacio_capacidad">Capacidad Máxima de Personas (Pax):</label>';
     echo '<input type="text" id="espacio_capacidad" name="espacio_capacidad" value="' . esc_attr($capacidad) . '" placeholder="Ej: 1,500" />';
     echo '<small style="color:#64748b; display:block; margin-top:6px;">Ejemplo: "1,500" se mostrará como "Hasta 1,500 Pax".</small></div>';
@@ -736,8 +1488,8 @@ function casadepiedra_espacio_meta_callback($post) {
     echo '<small style="color:#64748b; display:block; margin-top:6px;">Opciones separadas por coma para cotización en línea.</small></div>';
 
     echo '<div class="cdp-meta-field"><label for="espacio_m2">Superficie / Área en Metros Cuadrados (m²):</label>';
-    echo '<input type="text" id="espacio_m2" name="espacio_m2" value="' . esc_attr($m2) . '" placeholder="Ej: 2,400" />';
-    echo '<small style="color:#64748b; display:block; margin-top:6px;">Ejemplo: "2,400" se mostrará como "2,400 m²".</small></div>';
+    echo '<input type="text" id="espacio_m2" name="espacio_m2" value="' . esc_attr($m2) . '" placeholder="Ej: 1,500" />';
+    echo '<small style="color:#64748b; display:block; margin-top:6px;">Ejemplo: "1,500" se mostrará como "1,500 m²".</small></div>';
 
     echo '</div>'; // Fin tarjeta 2
 
@@ -756,6 +1508,20 @@ function casadepiedra_espacio_meta_callback($post) {
             frame.on("select", function(){
                 var attachment = frame.state().get("selection").first().toJSON();
                 $("#espacio_portada").val(attachment.url);
+            });
+            frame.open();
+        });
+
+        $("#btn_upload_espacio_tarjeta").on("click", function(e){
+            e.preventDefault();
+            var frame = wp.media({
+                title: "Seleccionar Imagen de Tarjeta de Inicio",
+                button: { text: "Usar Imagen" },
+                multiple: false
+            });
+            frame.on("select", function(){
+                var attachment = frame.state().get("selection").first().toJSON();
+                $("#espacio_tarjeta_inicio").val(attachment.url);
             });
             frame.open();
         });
@@ -785,6 +1551,9 @@ function casadepiedra_save_espacio_meta($post_id) {
     if (isset($_POST['espacio_portada'])) {
         update_post_meta($post_id, '_espacio_portada', esc_url_raw($_POST['espacio_portada']));
     }
+    if (isset($_POST['espacio_tarjeta_inicio'])) {
+        update_post_meta($post_id, '_espacio_tarjeta_inicio', esc_url_raw($_POST['espacio_tarjeta_inicio']));
+    }
     if (isset($_POST['espacio_capacidad'])) {
         update_post_meta($post_id, '_espacio_capacidad', sanitize_text_field($_POST['espacio_capacidad']));
     }
@@ -797,8 +1566,177 @@ function casadepiedra_save_espacio_meta($post_id) {
     if (isset($_POST['espacio_plano_pdf'])) {
         update_post_meta($post_id, '_espacio_plano_pdf', esc_url_raw($_POST['espacio_plano_pdf']));
     }
+    if (isset($_POST['espacio_panorama_tour'])) {
+        $tour_raw = wp_unslash($_POST['espacio_panorama_tour']);
+        $tour_decoded = json_decode($tour_raw, true);
+        $tour_clean = array();
+        if (is_array($tour_decoded)) {
+            foreach ($tour_decoded as $stop) {
+                if (!is_array($stop)) {
+                    continue;
+                }
+                $id = sanitize_key($stop['id'] ?? '');
+                $src = esc_url_raw($stop['src'] ?? '');
+                $name = casa_fix_stripped_unicode(sanitize_text_field($stop['name'] ?? ''));
+                if ($id === '' || ($src === '' && $name === '')) {
+                    continue;
+                }
+                $links = array();
+                if (!empty($stop['links']) && is_array($stop['links'])) {
+                    foreach ($stop['links'] as $link) {
+                        if (!is_array($link)) {
+                            continue;
+                        }
+                        $to = sanitize_key($link['to'] ?? '');
+                        if ($to === '' || $to === $id) {
+                            continue;
+                        }
+                        $links[] = array(
+                            'to' => $to,
+                            'yaw' => round((float) ($link['yaw'] ?? 0), 4),
+                            'pitch' => round((float) ($link['pitch'] ?? -0.45), 4),
+                        );
+                    }
+                }
+                $tour_clean[] = array(
+                    'id' => $id,
+                    'name' => $name !== '' ? $name : 'Parada',
+                    'src' => $src,
+                    'links' => $links,
+                );
+            }
+        }
+        update_post_meta($post_id, '_espacio_panorama_tour', wp_json_encode($tour_clean, JSON_UNESCAPED_UNICODE));
+        $first_src = '';
+        foreach ($tour_clean as $stop) {
+            if ($stop['src'] !== '') {
+                $first_src = $stop['src'];
+                break;
+            }
+        }
+        update_post_meta($post_id, '_espacio_panorama', $first_src);
+    } elseif (isset($_POST['espacio_panorama'])) {
+        update_post_meta($post_id, '_espacio_panorama', esc_url_raw($_POST['espacio_panorama']));
+    }
+    if (isset($_POST['espacio_subt'])) {
+        update_post_meta($post_id, '_espacio_subt', sanitize_text_field($_POST['espacio_subt']));
+    }
 }
 add_action('save_post_espacios', 'casadepiedra_save_espacio_meta');
+
+function casadepiedra_add_espacio_tour_meta() {
+    add_meta_box(
+        'casadepiedra_espacio_tour',
+        'Recorrido 360 por paradas',
+        'casadepiedra_espacio_tour_meta_callback',
+        'espacios',
+        'normal',
+        'high'
+    );
+}
+add_action('add_meta_boxes', 'casadepiedra_add_espacio_tour_meta');
+
+function casadepiedra_espacio_tour_meta_callback($post) {
+    $stops = function_exists('casa_espacio_tour_decode') ? casa_espacio_tour_decode($post->ID) : array();
+    $first = '';
+    foreach ($stops as $stop) {
+        if (!empty($stop['src'])) {
+            $first = $stop['src'];
+            break;
+        }
+    }
+    ?>
+    <style>
+        .casa-tour-editor { display: grid; grid-template-columns: minmax(260px, 340px) 1fr; gap: 18px; }
+        .casa-tour-help { margin: 0 0 14px; color: #475569; line-height: 1.5; }
+        .casa-tour-help ol { margin: 8px 0 0 18px; }
+        .casa-tour-stop { border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 10px; background: #fff; }
+        .casa-tour-stop label { display: block; font-weight: 600; margin-bottom: 4px; }
+        .casa-tour-stop input[type="text"], .casa-tour-stop input[type="url"] { width: 100%; }
+        .casa-tour-row { display: flex; gap: 8px; align-items: center; }
+        .casa-tour-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+        .casa-tour-preview-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin: 10px 0; }
+        .casa-tour-preview-tools label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .casa-tour-links { margin: 0; padding: 0; list-style: none; }
+        .casa-tour-links li { display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 8px 0; border-top: 1px solid #e2e8f0; }
+        .casa-tour-stage-wrap { --color-accent: #c1621e; }
+        .casa-tour-stage-wrap .espacio-tour__stage { position: relative; height: 460px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(193,98,30,.4); background: #050505; touch-action: none; cursor: grab; }
+        .casa-tour-stage-wrap .espacio-tour__stage.is-dragging { cursor: grabbing; }
+        .casa-tour-stage-wrap .espacio-tour__canvas { width: 100%; height: 100%; display: block; }
+        .casa-tour-stage-wrap .espacio-tour__status, .casa-tour-stage-wrap .espacio-tour__hint, .casa-tour-stage-wrap .espacio-tour__place { position: absolute; z-index: 2; }
+        .casa-tour-stage-wrap .espacio-tour__status { inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; color: #eee; background: rgba(5,5,5,.55); pointer-events: none; }
+        .casa-tour-stage-wrap .espacio-tour__stage.is-ready:not(.is-loading) .espacio-tour__status { display: none; }
+        .casa-tour-stage-wrap .espacio-tour__hint { top: 12px; left: 50%; transform: translateX(-50%); margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(8,8,8,.62); border: 1px solid rgba(193,98,30,.35); color: #f3f3f3; font-size: 12px; pointer-events: none; }
+        .casa-tour-stage-wrap .espacio-tour__stage.is-used .espacio-tour__hint { opacity: 0; }
+        .casa-tour-stage-wrap .espacio-tour__controls { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; z-index: 3; pointer-events: none; }
+        .casa-tour-stage-wrap .espacio-tour__pad, .casa-tour-stage-wrap .espacio-tour__zoom { pointer-events: auto; }
+        .casa-tour-stage-wrap .espacio-tour__pad { display: grid; grid-template-columns: repeat(3, 42px); grid-template-areas: ". up ." "left mid right" ". down ."; gap: 6px; }
+        .casa-tour-stage-wrap .espacio-tour__pad button[data-pan="up"] { grid-area: up; }
+        .casa-tour-stage-wrap .espacio-tour__pad button[data-pan="left"] { grid-area: left; }
+        .casa-tour-stage-wrap .espacio-tour__pad button[data-pan="right"] { grid-area: right; }
+        .casa-tour-stage-wrap .espacio-tour__pad button[data-pan="down"] { grid-area: down; }
+        .casa-tour-stage-wrap .espacio-tour__pad-core { grid-area: mid; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #c1621e; border: 1px solid rgba(193,98,30,.35); }
+        .casa-tour-stage-wrap .espacio-tour__zoom { display: flex; flex-direction: column; gap: 6px; }
+        .casa-tour-stage-wrap .espacio-tour__pad button, .casa-tour-stage-wrap .espacio-tour__zoom button { width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(193,98,30,.55); background: rgba(8,8,8,.72); color: #fff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+        .casa-tour-stage-wrap .espacio-tour__pad svg, .casa-tour-stage-wrap .espacio-tour__zoom svg { width: 16px; height: 16px; display: block; }
+        .casa-tour-stage-wrap .espacio-tour__hotspots { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+        .casa-tour-stage-wrap .espacio-tour__hotspot { position: absolute; transform: translate(-50%, -50%); pointer-events: auto; border: 0; background: transparent; color: #fff; cursor: grab; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 0; }
+        .casa-tour-stage-wrap .espacio-tour__hotspot:active { cursor: grabbing; }
+        .casa-tour-stage-wrap .espacio-tour__hotspot-arrow { width: 42px; height: 42px; border-radius: 50%; background: #c1621e; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 18px rgba(0,0,0,.45); }
+        .casa-tour-stage-wrap .espacio-tour__hotspot-label { font-size: 11px; background: rgba(8,8,8,.78); border: 1px solid rgba(193,98,30,.45); border-radius: 999px; padding: 2px 8px; }
+        .casa-tour-stage-wrap .espacio-tour__place { top: 12px; left: 12px; margin: 0; color: #fff; font-size: 13px; letter-spacing: .4px; background: rgba(8,8,8,.62); border: 1px solid rgba(193,98,30,.35); border-radius: 999px; padding: 4px 10px; }
+        @media (max-width: 960px) { .casa-tour-editor { grid-template-columns: 1fr; } }
+    </style>
+    <p class="casa-tour-help">Cada parada es una fotografía 360. Para caminar de una a otra:</p>
+    <ol class="casa-tour-help">
+        <li>Añade una parada por cada foto y súbela.</li>
+        <li>Elige la parada de destino y pulsa <strong>Poner flecha en esta vista</strong>. También se crea la flecha de regreso.</li>
+        <li>Arrastra la flecha naranja hasta el punto exacto del piso. Gira la vista: la flecha se queda en ese lugar y un clic salta a la otra foto.</li>
+        <li>Cambia a la otra parada y arrastra también su flecha de regreso. Después pulsa <strong>Actualizar</strong>.</li>
+    </ol>
+    <div id="casa-tour-editor" class="casa-tour-editor" data-stops="<?php echo esc_attr(wp_json_encode($stops, JSON_UNESCAPED_UNICODE)); ?>">
+        <div>
+            <div data-tour-list></div>
+            <button type="button" class="button button-primary" data-tour-add>Añadir parada</button>
+        </div>
+        <div class="casa-tour-stage-wrap">
+            <div class="espacio-tour__stage" data-panorama="<?php echo esc_url($first); ?>" data-editor="1" data-lenis-prevent tabindex="0">
+                <canvas class="espacio-tour__canvas"></canvas>
+                <p class="espacio-tour__status"><?php echo $first ? 'Cargando recorrido…' : 'Sube la fotografía 360 de esta parada.'; ?></p>
+                <p class="espacio-tour__hint">Arrastra la flecha hasta el punto exacto del piso</p>
+                <p class="espacio-tour__place" hidden></p>
+                <div class="espacio-tour__hotspots"></div>
+                <div class="espacio-tour__controls">
+                    <div class="espacio-tour__pad" role="group" aria-label="Mover la vista">
+                        <button type="button" data-pan="up" aria-label="Mirar arriba"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 4.5L14 11.5H4L9 4.5Z" fill="currentColor"/></svg></button>
+                        <button type="button" data-pan="left" aria-label="Mirar a la izquierda"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4.5 9L11.5 4V14L4.5 9Z" fill="currentColor"/></svg></button>
+                        <span class="espacio-tour__pad-core" aria-hidden="true">360</span>
+                        <button type="button" data-pan="right" aria-label="Mirar a la derecha"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M13.5 9L6.5 4V14L13.5 9Z" fill="currentColor"/></svg></button>
+                        <button type="button" data-pan="down" aria-label="Mirar abajo"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 13.5L4 6.5H14L9 13.5Z" fill="currentColor"/></svg></button>
+                    </div>
+                    <div class="espacio-tour__zoom">
+                        <button type="button" data-pan="in" aria-label="Acercar"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 3.5V14.5M3.5 9H14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                        <button type="button" data-pan="out" aria-label="Alejar"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 9H14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                </div>
+            </div>
+            <div class="casa-tour-preview-tools">
+                <div>
+                    <label for="casa-tour-active">Parada en vista</label>
+                    <select id="casa-tour-active" data-tour-active></select>
+                </div>
+                <div>
+                    <label for="casa-tour-dest">Flecha hacia</label>
+                    <select id="casa-tour-dest" data-tour-dest></select>
+                </div>
+                <button type="button" class="button button-primary" data-tour-drop>Poner flecha en esta vista</button>
+            </div>
+            <ul class="casa-tour-links" data-tour-links></ul>
+        </div>
+    </div>
+    <input type="hidden" name="espacio_panorama_tour" id="espacio_panorama_tour" value="<?php echo esc_attr(wp_json_encode($stops, JSON_UNESCAPED_UNICODE)); ?>" />
+    <?php
+}
 
 // 9. Meta Box para Eventos (Botón y Enlace)
 function casadepiedra_add_evento_meta() {
@@ -902,6 +1840,12 @@ function casadepiedra_check_expired_events() {
 // 7. Cargar script de auto-poblado (Páginas, CPTs y Accesos Directos)
 require_once get_template_directory() . '/inc/populate.php';
 
+if (!function_exists('casadepiedra_populate_data')) {
+    function casadepiedra_populate_data() {
+        casadepiedra_plug_and_play_setup();
+    }
+}
+
 // Restaurar enlace de Eventos en el menú principal tras borrar la página
 function casadepiedra_restore_eventos_menu_link() {
     // Solo purgar reglas de reescritura una vez para que el CPT /eventos/ no dé 404
@@ -973,7 +1917,7 @@ function casa_filter_nav_menu_items($items, $args) {
         }
     }
     if (!$has_eventos && $eventos_active) {
-        $evt_page = get_page_by_path('eventos') ?: get_page_by_title('Eventos');
+        $evt_page = get_page_by_path('eventos') ?: casadepiedra_get_post_by_title('Eventos');
         if ($evt_page) {
             $evt_item = new stdClass();
             $evt_item->ID = 999991;
@@ -1024,7 +1968,7 @@ function casa_filter_nav_menu_items($items, $args) {
             unset($items[$key]);
         }
         elseif (strpos($url, '/contacto') !== false || stripos($item->title, 'contacto') !== false) {
-            $item->url = '#quote-modal';
+            $item->url = trailingslashit(home_url('/contacto/'));
             $contacto_item = $item;
             $contacto_key = $key;
         }
@@ -1037,7 +1981,7 @@ function casa_filter_nav_menu_items($items, $args) {
         }
         $contacto_item->classes[] = 'nav-item-contacto';
         $contacto_item->classes[] = 'btn-open-quote-modal';
-        $contacto_item->url = '#quote-modal';
+        $contacto_item->url = trailingslashit(home_url('/contacto/'));
         unset($items[$contacto_key]);
         $items[] = $contacto_item;
     }
@@ -1186,7 +2130,7 @@ function casa_handle_send_cotizacion() {
             body { font-family: "Inter", sans-serif; background-color: #f4f4f5; padding: 20px; }
             .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
             .header { background: #0a0a0a; padding: 30px; text-align: center; }
-            .header h2 { color: #d4af37; margin: 0; font-weight: 300; letter-spacing: 2px; }
+            .header h2 { color: #c1621e; margin: 0; font-weight: 300; letter-spacing: 2px; }
             .content { padding: 30px; color: #333333; line-height: 1.6; }
             .content strong { color: #0a0a0a; }
             .footer { background: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; }
@@ -1230,7 +2174,7 @@ function casa_handle_send_cotizacion() {
             body { font-family: "Inter", sans-serif; background-color: #f4f4f5; padding: 20px; }
             .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
             .header { background: #0a0a0a; padding: 40px 30px; text-align: center; }
-            .header h2 { color: #d4af37; margin: 0; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; }
+            .header h2 { color: #c1621e; margin: 0; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; }
             .content { padding: 40px 30px; color: #4b5563; line-height: 1.8; }
             .content h3 { color: #111827; margin-top: 0; }
             .details { background: #f9fafb; padding: 20px; border-radius: 6px; margin-top: 20px; }
@@ -1260,7 +2204,7 @@ function casa_handle_send_cotizacion() {
                 
                 <p style="margin-top: 20px; font-size: 13px; color: #6b7280;"><em>* Nota: La selección de la fecha no garantiza una reservación de la misma. La fecha real del evento está sujeta a disponibilidad.</em></p>
                 
-                <p style="margin-top: 30px;">Si necesitas atención inmediata, no dudes en llamarnos al <a href="tel:4777172600" style="color: #d4af37;">477 717 2600</a>.</p>
+                <p style="margin-top: 30px;">Si necesitas atención inmediata, no dudes en llamarnos al <a href="tel:' . esc_attr(preg_replace('/\D+/', '', casa_get_display_phone())) . '" style="color: #c1621e;">' . esc_html(casa_get_display_phone()) . '</a>.</p>
             </div>
             <div class="footer">
                 Ex Hacienda Casa de Piedra<br>
@@ -1271,18 +2215,22 @@ function casa_handle_send_cotizacion() {
     </html>';
 
     $headers = array('Content-Type: text/html; charset=UTF-8');
+    if (is_email($email)) {
+        $headers[] = 'Reply-To: ' . $name . ' <' . $email . '>';
+    }
 
     // Send to admin
     $sent_admin = wp_mail($admin_email, $admin_subject, $admin_message, $headers);
-    
-    // Send to client
-    $sent_client = wp_mail($email, $client_subject, $client_message, $headers);
 
-    if ($sent_admin && $sent_client) {
+    $client_headers = array('Content-Type: text/html; charset=UTF-8');
+    $sent_client = wp_mail($email, $client_subject, $client_message, $client_headers);
+
+    if ($sent_admin) {
         wp_send_json_success();
-    } else {
-        wp_send_json_error('Hubo un problema al enviar el correo. Por favor intenta llamarnos.');
     }
+
+    $mail_err = get_transient('casa_last_mail_error');
+    wp_send_json_error($mail_err ? ('No se pudo enviar el correo: ' . $mail_err) : 'Hubo un problema al enviar el correo. Por favor intenta llamarnos.');
 }
 
 // 12. Aviso de Privacidad Auto-create & Route
@@ -1315,8 +2263,8 @@ add_action('init', function() {
         update_option('casa_opt_nosotros_subtitle', 'Donde el pasado y el presente se encuentran.');
         update_option('casa_opt_nosotros_desc', '<p style="margin-bottom: 1.5rem;">Desde 1845, sus muros de cantera han sido testigos de amor y celebración.</p><p>Hoy, en el corazón dorado de la ciudad, cada rincón invita a vivir experiencias únicas, donde la sofisticación se fusiona con la tradición, creando un espacio solo para los más exigentes.</p>');
         update_option('casa_opt_global_espacios_desc', 'Escenarios para grandes historias');
-        update_option('casa_opt_global_restaurantes_title', 'El epítome gastronómico del Bajío');
-        update_option('casa_opt_global_restaurantes_desc', 'la cúspide de la gastronomía en el Bajío. Una experiencia inigualable que reúne la oferta gastronómica más exclusivas de la región, ofreciendo un viaje de sabores únicos.');
+        update_option('casa_opt_global_restaurantes_title', 'La cúspide de la gastronomía en el Bajío.');
+        update_option('casa_opt_global_restaurantes_desc', 'Una experiencia inigualable que reúne la oferta gastronómica más exclusivas de la región, ofreciendo un viaje de sabores únicos.');
         update_option('casa_opt_google_maps_link', 'https://www.google.com/maps/place/Casa+De+Piedra/@21.1539759,-101.6967297,2188m/data=!3m2!1e3!5s0x842bbf530842ac4b:0x4642591264eb2eec!4m6!3m5!1s0x842bbf53a2e4d0e3:0xfe1f47b7b2f6b0a3!8m2!3d21.1585368!4d-101.6992601!16s%2Fg%2F11f_b_l520?entry=ttu');
 
         $espacios_new = array(
@@ -1339,9 +2287,9 @@ add_action('init', function() {
         );
 
         foreach ($espacios_new as $title => $data) {
-            $post = get_page_by_title($title, OBJECT, 'espacios');
+            $post = casadepiedra_get_post_by_title($title, 'espacios');
             if (!$post && $title === 'Terraza Mezquite') {
-                $post = get_page_by_title('Terraza del Mezquite', OBJECT, 'espacios');
+                $post = casadepiedra_get_post_by_title('Terraza del Mezquite', 'espacios');
             }
             if ($post) {
                 wp_update_post(array(
@@ -1367,6 +2315,7 @@ add_action('init', function() {
         $official_titles = array(
             'Argentilia',
             'Lucio Ítalo-Argentino',
+            'Manolo',
             'Manolo Taberna Española',
             'Sato Cocina Nikkei',
             'Casa Mía Trattoria & Wine Bar',
@@ -1380,51 +2329,26 @@ add_action('init', function() {
             }
         }
 
+        update_option('casa_texts_synced_v6', '1');
         update_option('casa_texts_synced_v7_clean_restaurantes', '1');
     }
 });
 
-/**
- * Títulos Dinámicos en Mayúsculas (SEO & UX)
- * Garantiza que la pestaña del navegador siempre muestre "PÁGINA | CASA DE PIEDRA" en MAYÚSCULAS.
- */
-add_filter('pre_get_document_title', function($title) {
-    if (is_front_page() || is_home()) {
-        return 'INICIO | CASA DE PIEDRA';
+add_action('init', function() {
+    if (get_option('casa_copy_synced_v8') === '1') {
+        return;
     }
-    if (is_post_type_archive('espacios') || is_page_template('archive-espacios.php') || is_page('espacios') || is_page('venues')) {
-        return 'VENUES | CASA DE PIEDRA';
-    }
-    if (is_post_type_archive('restaurantes') || is_page_template('archive-restaurantes.php') || is_page('restaurantes')) {
-        return 'RESTAURANTES | CASA DE PIEDRA';
-    }
-    if (is_post_type_archive('eventos') || is_page_template('archive-eventos.php') || is_page('eventos')) {
-        return 'EVENTOS | CASA DE PIEDRA';
-    }
-    if (is_page('galeria') || is_page_template('page-galeria.php')) {
-        return 'GALERÍA | CASA DE PIEDRA';
-    }
-    if (is_page('contacto') || is_page_template('page-contacto.php')) {
-        return 'CONTACTO | CASA DE PIEDRA';
-    }
-    if (is_page('quienes-somos') || is_page_template('page-quienes-somos.php')) {
-        return 'QUIÉNES SOMOS | CASA DE PIEDRA';
-    }
-    $raw = get_the_title();
-    if (empty($raw)) {
-        return 'CASA DE PIEDRA | LEÓN, GTO.';
-    }
-    return mb_strtoupper($raw, 'UTF-8') . ' | CASA DE PIEDRA';
-}, 99);
+    update_option('casa_opt_global_restaurantes_title', 'La cúspide de la gastronomía en el Bajío.');
+    update_option('casa_opt_global_restaurantes_desc', 'Una experiencia inigualable que reúne la oferta gastronómica más exclusivas de la región, ofreciendo un viaje de sabores únicos.');
 
-add_filter('document_title_parts', function($title) {
-    if (is_array($title)) {
-        foreach ($title as $k => $v) {
-            $title[$k] = mb_strtoupper($v, 'UTF-8');
-        }
+    $jardin = casadepiedra_get_post_by_title('Jardín Principal', 'espacios');
+    if ($jardin) {
+        update_post_meta($jardin->ID, '_espacio_m2', '1,500');
     }
-    return $title;
-}, 999);
+    update_option('casa_copy_synced_v8', '1');
+});
+
+/* Títulos SEO: los define inc/seo.php (keywords + entidad, no mayúsculas). */
 
 /**
  * Auto-corrección permanente del domicilio oficial si existía información anterior errónea en base de datos.
@@ -1438,4 +2362,119 @@ add_action('init', function() {
     if (!empty($rev1) && stripos($rev1, 'Hacienda Casa de Piedra') !== false && stripos($rev1, 'Ex Hacienda') === false && stripos($rev1, 'Ex-Hacienda') === false) {
         update_option('casa_opt_home_rev1_text', str_ireplace('Hacienda Casa de Piedra', 'Ex Hacienda Casa de Piedra', $rev1));
     }
+});
+
+/**
+ * Configuración SMTP Global para WordPress
+ * Conecta wp_mail() con las opciones del panel "Mails (Correos)"
+ */
+function casa_smtp_from_email() {
+    $from = trim((string) get_option('casa_opt_smtp_from_email', ''));
+    if (is_email($from)) {
+        return $from;
+    }
+    $user = trim((string) get_option('casa_opt_smtp_username', ''));
+    if (is_email($user)) {
+        return $user;
+    }
+    $global = trim((string) get_option('casa_opt_global_email', ''));
+    return is_email($global) ? $global : get_option('admin_email');
+}
+
+function casa_smtp_from_name() {
+    $name = trim((string) get_option('casa_opt_smtp_from_name', ''));
+    return $name !== '' ? $name : 'Casa de Piedra';
+}
+
+add_filter('wp_mail_from', function ($from) {
+    $opt = casa_smtp_from_email();
+    return is_email($opt) ? $opt : $from;
+});
+
+add_filter('wp_mail_from_name', function ($name) {
+    return casa_smtp_from_name() ?: $name;
+});
+
+add_action('phpmailer_init', function ($phpmailer) {
+    $smtp_host = trim((string) get_option('casa_opt_smtp_host', ''));
+    if ($smtp_host === '') {
+        return;
+    }
+
+    $smtp_user = trim((string) get_option('casa_opt_smtp_username', ''));
+    $smtp_pass = (string) get_option('casa_opt_smtp_password', '');
+    $smtp_enc  = strtolower(trim((string) get_option('casa_opt_smtp_encryption', 'tls')));
+    $smtp_port = (int) get_option('casa_opt_smtp_port', 0);
+
+    if ($smtp_port <= 0) {
+        $smtp_port = ($smtp_enc === 'ssl') ? 465 : 587;
+    }
+    if ($smtp_enc === '' || $smtp_enc === 'auto') {
+        $smtp_enc = ($smtp_port === 465) ? 'ssl' : 'tls';
+    }
+
+    $phpmailer->isSMTP();
+    $phpmailer->Host = $smtp_host;
+    $phpmailer->Port = $smtp_port;
+    $phpmailer->Timeout = 20;
+    $phpmailer->CharSet = 'UTF-8';
+    $phpmailer->SMTPAutoTLS = true;
+
+    if ($smtp_enc === 'ssl' || $smtp_enc === 'tls') {
+        $phpmailer->SMTPSecure = $smtp_enc;
+    } else {
+        $phpmailer->SMTPSecure = '';
+        $phpmailer->SMTPAutoTLS = false;
+    }
+
+    if ($smtp_user !== '' && $smtp_pass !== '') {
+        $phpmailer->SMTPAuth = true;
+        $phpmailer->Username = $smtp_user;
+        $phpmailer->Password = $smtp_pass;
+    } else {
+        $phpmailer->SMTPAuth = false;
+    }
+
+    $from_email = casa_smtp_from_email();
+    $from_name  = casa_smtp_from_name();
+    if (is_email($from_email)) {
+        try {
+            $phpmailer->setFrom($from_email, $from_name, false);
+        } catch (Exception $e) {
+            $phpmailer->From = $from_email;
+            $phpmailer->FromName = $from_name;
+        }
+        $phpmailer->Sender = $from_email;
+    }
+});
+
+add_action('wp_mail_failed', function ($error) {
+    if (is_wp_error($error)) {
+        set_transient('casa_last_mail_error', $error->get_error_message(), 15 * MINUTE_IN_SECONDS);
+    }
+});
+
+add_action('wp_ajax_casa_test_smtp', function () {
+    if (!current_user_can('manage_options') || !check_ajax_referer('casa_test_smtp', 'nonce', false)) {
+        wp_send_json_error('No autorizado.');
+    }
+    $to = sanitize_email(wp_unslash($_POST['to'] ?? ''));
+    if (!is_email($to)) {
+        $to = casa_smtp_from_email();
+    }
+    if (!is_email($to)) {
+        wp_send_json_error('Indica un correo válido para la prueba.');
+    }
+    delete_transient('casa_last_mail_error');
+    $host = trim((string) get_option('casa_opt_smtp_host', ''));
+    $body = '<p>Este es un correo de prueba del panel Casa de Piedra.</p><p>Si lo recibiste, SMTP está funcionando.</p>';
+    if ($host === '') {
+        $body .= '<p><em>Nota: aún no hay host SMTP configurado; el envío usó el correo del servidor.</em></p>';
+    }
+    $sent = wp_mail($to, 'Prueba SMTP — Casa de Piedra', $body, array('Content-Type: text/html; charset=UTF-8'));
+    if ($sent) {
+        wp_send_json_success('Correo de prueba enviado a ' . $to . '. Revisa bandeja de entrada y spam.');
+    }
+    $err = get_transient('casa_last_mail_error');
+    wp_send_json_error($err ? $err : 'El envío falló. Verifica host, puerto (587 TLS o 465 SSL), usuario y contraseña.');
 });
